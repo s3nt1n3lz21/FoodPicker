@@ -1,57 +1,7 @@
-<h2>Search Results</h2>
-<ag-grid-angular
-  #agGridMatchingFoods
-  [defaultColDef]="defaultColDef"
-  class="ag-theme-alpine"
-  [rowData]="matchingFoods"
-  [columnDefs]="columnDefs"
-  rowSelection="multiple"
-  [gridOptions]="gridOptions"
-  [frameworkComponents]="frameworkComponents"
-  groupSelectsChildren 
->
-</ag-grid-angular>
-<h2>Chosen Foods</h2>
-<ag-grid-angular
-  #agGridChosenFoods
-  [defaultColDef]="defaultColDef"
-  class="ag-theme-alpine"
-  [rowData]="chosenFoods"
-  [columnDefs]="columnDefs"
-  rowSelection="multiple"
-  [gridOptions]="gridOptions"
-  [frameworkComponents]="frameworkComponents"
-  groupSelectsChildren 
->
-</ag-grid-angular>
-<h2>Suggested Foods</h2>
-<ag-grid-angular
-  #agGridSuggestedFoods
-  [defaultColDef]="defaultColDef"
-  class="ag-theme-alpine"
-  [rowData]="suggestedFoods"
-  [columnDefs]="columnDefs"
-  rowSelection="multiple"
-  [gridOptions]="gridOptions"
-  [frameworkComponents]="frameworkComponents"
-  groupSelectsChildren 
->
-</ag-grid-angular>
-
-<div class="content" role="main">
-
-  <input id="preview" type="file" (change)="loadCSV($event.target.files)" />
-  <button (click)="pickSuggestedFoods()">Suggest Foods</button>
-  <button (click)="addRandomFood()">Add Suggested Food</button>
-  <button (click)="clearSuggestedFoods()">Clear Suggested Foods</button>
-  <button (click)="chooseFoods()">Choose Suggested Foods</button>
-  <button (click)="notAvailable()">Foods Not Available</button>
-  <button (click)="replaceSuggestedFoods()">Replace Suggested Foods</button>
-  <button (click)="removeFoods()">Remove Suggested Foods</button>
-  <button (click)="addSearchedFoods()">Add Searched Foods</button>
-  <input type="search" [(ngModel)]="search"><button (click)="searchFood(search)">Search</button>
-
-  <p>Total Price: {{totalPrice}} Total Protein Per Day: {{totalProteinPerDay}} Days Food: {{daysFood}}</p>
+<div class="main">
+  <!-- <input id="preview" type="file" (change)="previewFile($event.target.files)" /> -->
+  <app-header class="header"></app-header>
+  <div class="body">
+      <router-outlet #outlet="outlet"></router-outlet>
+  </div>
 </div>
-
-<router-outlet></router-outlet>

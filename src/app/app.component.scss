@@ -1,15 +1,17 @@
-table {
-    width: 100%
+@import "./theme.scss";
+
+.main {
+    min-height: 100vh;
+    min-width: 100vh
 }
 
-th.short {
-    width: 15%
+.header {
+    display: flex;
+    width: 100%;
+    min-height: 100px;
+    position: sticky;
 }
 
-.rated-before {
-    background-color: green !important;
-}
-
-.clickable {
-    cursor: pointer;
+.body {
+    min-height: calc(100vh - 200px);
 }
