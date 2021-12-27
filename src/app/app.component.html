@@ -40,93 +40,18 @@
 
 <div class="content" role="main">
 
-  <input id="preview" type="file" (change)="previewFile($event.target.files)" />
+  <input id="preview" type="file" (change)="loadCSV($event.target.files)" />
   <button (click)="pickSuggestedFoods()">Suggest Foods</button>
   <button (click)="addRandomFood()">Add Suggested Food</button>
   <button (click)="clearSuggestedFoods()">Clear Suggested Foods</button>
-  <button (click)="chooseFoods()">Choose Selected Foods</button>
+  <button (click)="chooseFoods()">Choose Suggested Foods</button>
   <button (click)="notAvailable()">Foods Not Available</button>
   <button (click)="replaceSuggestedFoods()">Replace Suggested Foods</button>
-  
+  <button (click)="removeFoods()">Remove Suggested Foods</button>
+  <button (click)="addSearchedFoods()">Add Searched Foods</button>
   <input type="search" [(ngModel)]="search"><button (click)="searchFood(search)">Search</button>
 
-  <table class="table table-bordered table-dark mt-5">
-    <thead>
-      <tr>
-        <!-- <th *ngFor="let item of lines[0]; let i = index">{{item}}</th> -->
-        <th>Name</th> <!-- Food -->
-        <th>ProteinPer100Calorie</th> <!-- ProteinPer100Calorie -->
-        <th>Price</th> <!-- Price -->
-        <th>TotalCalories</th> <!-- TotalCalories -->
-        <th>TotalProtein</th> <!-- TotalProtein -->
-        <td>PoundsPer1000Calorie</td> <!-- PoundsPer1000Calorie -->
-        <td>Rank</td> <!-- Rank -->
-        <th>Replace</th>
-        <th>Fix</th>
-        <th>Remove</th>
-        <th>Not Available</th>
-        <th>Add</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of matchingFoods; let i = index">
-        <td><a (click)="onClickMatchingFood(i)">{{food.name}}</a></td>
-        <td>{{food.proteinPer100Calorie | number : '1.2-2'}}</td>
-        <td>{{food.price}}</td>
-        <th>{{food.totalCalories | number : '1.2-2'}}</th>
-        <td>{{food.totalProtein | number : '1.2-2'}}</td>
-        <td>{{food.poundsPer1000Calories | number : '1.2-2'}}</td>
-        <td>{{food.rankWeighting | number : '1.0-0'}}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td><input type="checkbox" (change)="addMatchingFood(i)"></td>
-      </tr>
-      <tr>//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      </tr>
-      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of chosenFoods; let i = index">
-        <td><a (click)="onClickFixedFood(i)">{{food.name}}</a></td>
-        <td>{{food.proteinPer100Calorie | number : '1.2-2'}}</td>
-        <td>{{food.price}}</td>
-        <th>{{food.totalCalories | number : '1.2-2'}}</th>
-        <td>{{food.totalProtein | number : '1.2-2'}}</td>
-        <td>{{food.poundsPer1000Calories | number : '1.2-2'}}</td>
-        <td>{{food.rankWeighting | number : '1.0-0'}}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      </tr>
-      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of suggestedFoods; let i = index">
-        <td><a class="clickable" (click)="onClickPickedFood(i)">{{food.name}}</a></td>
-        <td>{{food.proteinPer100Calorie | number : '1.2-2'}}</td>
-        <td>{{food.price}}</td>
-        <th>{{food.totalCalories | number : '1.2-2'}}</th>
-        <td>{{food.totalProtein | number : '1.2-2'}}</td>
-        <td>{{food.poundsPer1000Calories | number : '1.2-2'}}</td>
-        <td>{{food.rankWeighting | number : '1.0-0'}}</td>
-        <td><input type="checkbox" (change)="replaceFood(i)"></td>
-        <td></td>
-        <td><input type="checkbox" (change)="removeFood(i)"></td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-
   <p>Total Price: {{totalPrice}} Total Protein Per Day: {{totalProteinPerDay}} Days Food: {{daysFood}}</p>
-
-  <button (click)="getSelectedRows()">Get Selected Rows</button>
-
-
-
- 
-
 </div>
-
 
 <router-outlet></router-outlet>

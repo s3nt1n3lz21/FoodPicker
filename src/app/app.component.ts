@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
     )
   }
 
-  public previewFile(files: FileList) {
+  public loadCSV(files: FileList) {
     console.log(files);
     if (files && files.length > 0) {
       let file: File = files.item(0);
@@ -186,16 +186,12 @@ export class AppComponent implements OnInit {
 
   public getRandomValidFood() {
     // keep getting a random food thats available
-    // return this.getRandomFood();
 
     let food = this.getRandomFood();
     let foodAvailable = food.available;
     let ignoreFood = food.ignore;
     let poundsPer1000Calorie = food.poundsPer1000Calories;
     let rank = food.rankWeighting*1;
-    // if (isNaN(rank)) {
-    //   rank = 0;
-    // }
 
     // get another food if food not available, or ignoring food, or costs too much
     // ~ 1400 calories a day ~ 10000 calories every 7 days. £70 per 10000 calories
@@ -207,14 +203,7 @@ export class AppComponent implements OnInit {
       poundsPer1000Calorie = food.poundsPer1000Calories;
       rank = food.rankWeighting*1;
       limit += 1;
-      // if (isNaN(rank)) {
-      //   rank = 0;
-      // }
     }
-
-    // console.log('food name: ', food[0], " rank: ", rank, "food[19]*1: ", food[19]*1);
-    // console.log('food[21]: ', food[21]);
-    // console.log('poundsPer1000Calorie: ', poundsPer1000Calorie);
 
     return food;
   }
@@ -228,7 +217,6 @@ export class AppComponent implements OnInit {
     let lowestProtein = Number.POSITIVE_INFINITY;
     let lowestIndex = 0;
     for (let index = foods.length - 1; index >= 0; index--) {
-      // use proteinPer100Calories
       tempProtein = foods[index].proteinPer100Calorie;
       if (tempProtein < lowestProtein) {
         lowestProtein = tempProtein;
@@ -243,7 +231,6 @@ export class AppComponent implements OnInit {
     let totalProtein = 0;
     for (let index = foods.length - 1; index >= 0; index--) {
       let protein = foods[index].totalProtein;
-      // console.log('protein: ', protein);
       if (!isNaN(protein)) {
         totalProtein += protein;
       }
@@ -256,7 +243,6 @@ export class AppComponent implements OnInit {
     let totalCalories = 0;
     for (let index = foods.length - 1; index >= 0; index--) {
       let calories = foods[index].totalCalories;
-      // console.log('protein: ', protein);
       if (!isNaN(calories)) {
         totalCalories += calories;
       }
@@ -269,7 +255,6 @@ export class AppComponent implements OnInit {
     let totalPrice = 0;
     for (let index = foods.length - 1; index >= 0; index--) {
       let price = foods[index].price;
-      // console.log('protein: ', protein);
       if (!isNaN(price)) {
         totalPrice += price;
       }
@@ -280,24 +265,19 @@ export class AppComponent implements OnInit {
 
   public chooseFoods() {
     const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
-    const selectedData: Food[] = selectedNodes.map(node => {
+    const selectedFoods: Food[] = selectedNodes.map(node => {
       return node.data;
     });
 
-    selectedData.forEach(data => {
-      const index = this.suggestedFoods.findIndex(f => data.id === f.id)
+    selectedFoods.forEach(food => {
+      const index = this.suggestedFoods.findIndex(f => food.id === f.id);
       this.suggestedFoods.splice(index, 1);
-    })
+      this.chosenFoods.push(food);
+    });
 
-    this.agGridChosenFoods.api.setRowData(selectedData);
+    this.agGridChosenFoods.api.setRowData(this.chosenFoods);
     this.agGridSuggestedFoods.api.removeItems(selectedNodes);
   }
-
-  // public fixFood(index: number) {
-  //   this.chosenFoods.push(this.suggestedFoods[index]);
-  //   console.log(this.suggestedFoods[index]);
-  //   this.suggestedFoods.splice(index, 1);
-  // }
 
   public replaceSuggestedFoods() {
     // Remove the suggested foods and add replace with random foods
@@ -317,33 +297,21 @@ export class AppComponent implements OnInit {
     this.recalculateFoods();
   }
 
-  public replaceFood(index: number) {
-    // Remove the food from the list
-    this.suggestedFoods.splice(index, 1);
+  public removeFoods() {
+    // Remove the selected suggested foods from the list
+    const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
+    selectedNodes.forEach(node => {
+      const food: Food = node.data;
+      const index = this.suggestedFoods.findIndex((f) => f.id === food.id)
+      if (index) {
+        this.suggestedFoods.splice(index, 1);
+      }
+    });
 
-    // Add another random food
-    this.suggestedFoods.push(this.getRandomValidFood());
-
-    this.recalculateNumbers();
-    this.recalculateFoods();
-  }
-
-  public removeFood(index: number) {
-    // Remove the food from the list
-    this.suggestedFoods.splice(index, 1);
+    this.agGridSuggestedFoods.api.setRowData(this.suggestedFoods);
 
     this.recalculateNumbers();
     this.recalculateFoods();
-  }
-
-  public onClickPickedFood(index: number) {
-    const url = this.suggestedFoods[index].url;
-    window.open(url, '_blank');
-  }
-
-  public onClickFixedFood(index: number) {
-    const url = this.chosenFoods[index].url;
-    window.open(url, '_blank');
   }
 
   public notAvailable() {
@@ -369,17 +337,6 @@ export class AppComponent implements OnInit {
         this.matchingFoods.splice(index3, 1);
       }
     });
-    
-
-
-
-    // const food = this.suggestedFoods[index];
-    // food.totalCalories
-    // const foodsIndex = this.foods.findIndex((element) => element.id == food.id);
-    // this.foods[foodsIndex].available = false;
-
-    // Remove the food from the picked foods list
-    // this.suggestedFoods.splice(index, 1);
 
     // Replace with a random food
     this.suggestedFoods.push(this.getRandomValidFood());
@@ -388,26 +345,28 @@ export class AppComponent implements OnInit {
     this.recalculateFoods();
   }
 
-  public searchFood(name: string) {
-    console.log('search: ', name);
-    this.matchingFoods = this.foods.filter((element) => element[0].includes(name));
+  public searchFood(searchString: string) {
+    this.matchingFoods = this.foods.filter((f) => f.name.includes(searchString));
+    console.log('matchingFoods: ', this.matchingFoods);
+    this.agGridMatchingFoods.api.setRowData(this.matchingFoods);
   }
 
-  // public onClickMatchingFood(index: number) {
-  //   const url = this.matchingFoods[index].url;
-  //   window.open(url, '_blank');
-  // }
+  public addSearchedFoods() {
+    // Get the selected searched foods and add them to chosen foods
+    const selectedNodes = this.agGridMatchingFoods.api.getSelectedNodes();
+    selectedNodes.forEach(node => {
+      const food: Food = node.data;
+      const index = this.matchingFoods.findIndex((f) => f.id === food.id)
+      if (index) {
+        this.chosenFoods.push(food);
+      }
+    });
 
-  public addMatchingFood(index: number) {
-    let food = this.matchingFoods[index];
-    console.log('matchingFood: ', food);
-    this.chosenFoods.push(food);
+    this.agGridChosenFoods.api.setRowData(this.chosenFoods);
 
     this.recalculateNumbers();
     this.recalculateFoods();
   }
-
-  //////////////////////////////////////
 
   rowData: Observable<any[]>;
   @ViewChild('agGridMatchingFoods') agGridMatchingFoods!: AgGridAngular;
@@ -427,7 +386,6 @@ export class AppComponent implements OnInit {
     { field: 'totalProtein'},
     { field: 'poundsPer1000Calories'},
     { field: 'rankWeighting'},
-    // { field: 'make', rowGroup: true },
     { field: 'price' }
   ];
 
@@ -440,39 +398,4 @@ export class AppComponent implements OnInit {
       'rated-before': params => params.api.getValue('rankWeighting', params.node) != 0,
     }
   }
-
-
-
-  // autoGroupColumnDef: ColDef = {
-  //     headerName: 'Model',
-  //     field: 'model',
-  //     cellRenderer: 'agGroupCellRenderer',
-  //     cellRendererParams: {
-  //         checkbox: true
-  //     }
-  // };
-
-  getSelectedRows(): void {
-        const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
-        const selectedData = selectedNodes.map(node => {
-          if (node.groupData) {
-            return { make: node.key, model: 'Group' };
-          }
-          return node.data;
-        });
-        const selectedDataStringPresentation = selectedData.map(node => `${node.make} ${node.model}`).join(', ');
-
-        alert(`Selected nodes: ${selectedDataStringPresentation}`);
-  }
-
-
-
-
-
-
-
-
 }
-
-// TODO
-// search and add foods
