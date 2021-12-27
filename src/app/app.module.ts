@@ -6,17 +6,19 @@ import { AgGridModule } from 'ag-grid-angular';
 import 'ag-grid-enterprise';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { NameRendererComponent } from './ag-grid/renderers/name-renderer/name-renderer.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    NameRendererComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    AgGridModule.withComponents([]),
+    AgGridModule.withComponents([NameRendererComponent]),
   ],
   providers: [],
   bootstrap: [AppComponent]

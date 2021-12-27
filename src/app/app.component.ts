@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridOptions, RowClassRules } from 'ag-grid-community';
+import { ColDef, GridOptions } from 'ag-grid-community';
 import { Observable } from 'rxjs';
+import { NameRendererComponent } from './ag-grid/renderers/name-renderer/name-renderer.component';
 import { AddFood, emptyAddFood, emptyFood, Food } from './model/IFood';
 import { ApiService } from './services/api.service';
 
@@ -412,7 +413,7 @@ export class AppComponent implements OnInit {
   };
 
   columnDefs: ColDef[] = [
-    { field: 'name', minWidth: 300, checkboxSelection: true },
+    { field: 'name', minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer", },
     { field: 'proteinPer100Calorie'},
     { field: 'totalCalories'},
     { field: 'totalProtein'},
@@ -421,6 +422,10 @@ export class AppComponent implements OnInit {
     // { field: 'make', rowGroup: true },
     { field: 'price' }
   ];
+
+  frameworkComponents = {
+    nameRenderer: NameRendererComponent,
+  };
 
   gridOptions: GridOptions = {
     rowClassRules: {
