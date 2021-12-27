@@ -300,18 +300,18 @@ export class AppComponent implements OnInit {
   // }
 
   public replaceSuggestedFoods() {
-    // Remove the suggested food
-    const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
+    // Remove the suggested foods and add replace with random foods
+    const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
     selectedNodes.forEach(node => {
-      const data: Food = node.data;
-      const index = this.chosenFoods.findIndex((f) => f.id === data.id)
+      const food: Food = node.data;
+      const index = this.suggestedFoods.findIndex((f) => f.id === food.id)
       if (index) {
-        this.chosenFoods.splice(index, 1);
+        this.suggestedFoods.splice(index, 1);
+        this.suggestedFoods.push(this.getRandomValidFood());
       }
     });
 
-    // Add another random food to picked foods
-    this.suggestedFoods.push(this.getRandomValidFood());
+    this.agGridSuggestedFoods.api.setRowData(this.suggestedFoods);
 
     this.recalculateNumbers();
     this.recalculateFoods();
