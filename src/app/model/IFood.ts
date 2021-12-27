@@ -1,3 +1,5 @@
+import { FormGroup } from "@angular/forms"
+
 export interface AddFood {
     name: string;
     url: string;
@@ -87,3 +89,11 @@ export function emptyAddFood(): AddFood {
         id: '',
     }
   }
+
+// export interface IQuestionFormValues extends Food {
+
+// }
+
+export interface IFoodForm extends FormGroup {
+    value: Food;
+}

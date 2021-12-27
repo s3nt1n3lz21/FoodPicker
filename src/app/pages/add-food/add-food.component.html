@@ -1,1 +1,32 @@
-<p>add-food works!</p>
+<form [formGroup]="questionForm">
+    <div class="input-container">
+        <div class="label">Name:</div>
+        <input class="input" type="text" placeholder="Add Name" formControlName="name">
+    </div>
+    <div class="input-container">
+        <div class="label">URL:</div>
+        <input class="input" type="text" placeholder="Add URL" formControlName="url">
+    </div>
+    <div class="input-container">
+        <div class="label">Total Calories:</div>
+        <input class="input" type="text" placeholder="Add Total Calories" formControlName="totalCalories">
+    </div>
+    <div class="input-container">
+        <div class="label">Total Protein:</div>
+        <input class="input" type="text" placeholder="Add Total Protein" formControlName="totalProtein">
+    </div>
+    <div class="input-container">
+        <div class="label">Ranking:</div>
+        <input class="input" type="text" placeholder="Add Ranking" formControlName="rankWeighting">
+    </div>
+    <div class="input-container">
+        <div class="label">Times Eaten:</div>
+        <input class="input" type="text" placeholder="Add Times Eaten" formControlName="timesEaten">
+    </div>
+    <div class="input-container">
+        <div class="label">Price:</div>
+        <input class="input" type="text" placeholder="Add Price" formControlName="price">
+    </div>
+</form>
+
+<button class="button" (click)="addFood()">Add Food</button>
