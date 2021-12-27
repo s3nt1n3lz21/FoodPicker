@@ -14,14 +14,14 @@ import { ApiService } from './services/api.service';
 })
 export class AppComponent implements OnInit {
   title = 'food-picker';
-  fixedFoods: Food[] = [];
+  chosenFoods: Food[] = [];
   matchingFoods: Food[] = [];
   search = "";
 
   headings = Object.keys(emptyFood()); // headings
   foods: Food[] = []; // foods
 
-  pickedFoods: Food[] = [];
+  suggestedFoods: Food[] = [];
   caloriesPerDay = 1400;
 
   totalPrice = 0;
@@ -52,11 +52,10 @@ export class AppComponent implements OnInit {
         }
   
         this.foods = foods;
-        // this.rowData = this.foods
-        console.log('this.foods: ', this.foods);
-        this.agGridPickedFoods.api.sizeColumnsToFit();
+
+        this.agGridSuggestedFoods.api.sizeColumnsToFit();
         this.agGridMatchingFoods.api.sizeColumnsToFit();
-        this.agGridFixedFoods.api.sizeColumnsToFit();
+        this.agGridChosenFoods.api.sizeColumnsToFit();
         // Set all the foods to available
         this.foods.forEach((food) => food.available = true);
       },
@@ -113,7 +112,6 @@ export class AppComponent implements OnInit {
         }
 
         
-        console.log('adding foods: ', newFoods);
 
 
         // newFoods.forEach(food => {
@@ -124,7 +122,7 @@ export class AppComponent implements OnInit {
   }
 
   public recalculateNumbers() {
-    let allPickedFoods = this.pickedFoods.concat(this.fixedFoods);
+    let allPickedFoods = this.suggestedFoods.concat(this.chosenFoods);
     this.totalPrice = this.getTotalPrice(allPickedFoods);
     this.totalProtein = this.getTotalProtein(allPickedFoods);
     this.totalCalories = this.getTotalCalories(allPickedFoods);
@@ -133,17 +131,17 @@ export class AppComponent implements OnInit {
   }
 
   public clearAllFoods() {
-    this.pickedFoods = [];
-    this.fixedFoods = [];
+    this.suggestedFoods = [];
+    this.chosenFoods = [];
     this.recalculateNumbers();
   }
 
-  public clearPickedFoods() {
-    this.pickedFoods = [];
+  public clearSuggestedFoods() {
+    this.suggestedFoods = [];
     this.recalculateNumbers();
   }
 
-  public pickFoods() {
+  public pickSuggestedFoods() {
 
     let allPickedFoods = [];
 
@@ -151,19 +149,17 @@ export class AppComponent implements OnInit {
     let limit = 0;
     while (this.totalPrice < 40 && limit < 100) {
       const food = this.getRandomValidFood();
-      this.pickedFoods.push(food);
-      allPickedFoods = this.pickedFoods.concat(this.fixedFoods);
+      this.suggestedFoods.push(food);
+      allPickedFoods = this.suggestedFoods.concat(this.chosenFoods);
       this.totalPrice = this.getTotalPrice(allPickedFoods);
-      console.log(this.totalPrice);
       limit += 1;
     }
-    console.log('finished picking initial foods');
 
     this.recalculateNumbers();
 
     this.recalculateFoods();
 
-    this.agGridPickedFoods.api.setRowData(this.pickedFoods);
+    this.agGridSuggestedFoods.api.setRowData(this.suggestedFoods);
   }
 
   // Keep replacing foods until conditions met
@@ -174,8 +170,8 @@ export class AppComponent implements OnInit {
     let maxProtein = 2.2 * 58;
     while ((this.totalProteinPerDay < 80 || this.daysFood < 7) && numLoops < maxLoops) {
       // get lowest protein food and replace with random food
-      const lowestIndex = this.findLowestProteinFood(this.pickedFoods);
-      this.pickedFoods[lowestIndex] = this.getRandomValidFood();
+      const lowestIndex = this.findLowestProteinFood(this.suggestedFoods);
+      this.suggestedFoods[lowestIndex] = this.getRandomValidFood();
 
       this.recalculateNumbers();
 
@@ -184,8 +180,8 @@ export class AppComponent implements OnInit {
   }
 
   public addRandomFood() {
-    this.pickedFoods.push(this.getRandomValidFood());
-    this.pickedFoods.sort((a, b) => a.proteinPer100Calorie > b.proteinPer100Calorie ? -1 : 1)
+    this.suggestedFoods.push(this.getRandomValidFood());
+    this.suggestedFoods.sort((a, b) => a.proteinPer100Calorie > b.proteinPer100Calorie ? -1 : 1)
   }
 
   public getRandomValidFood() {
@@ -282,28 +278,35 @@ export class AppComponent implements OnInit {
     return totalPrice;
   }
 
-  public fixFoods() {
-    const selectedNodes = this.agGridPickedFoods.api.getSelectedNodes();
+  public chooseFoods() {
+    const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
     const selectedData = selectedNodes.map(node => {
       return node.data;
     });
 
-    this.agGridFixedFoods.api.setRowData(selectedData);
-    // this.agGridPickedFoods.api
+    this.agGridChosenFoods.api.setRowData(selectedData);
+    // this.agGridSuggestedFoods.api
   }
 
   // public fixFood(index: number) {
-  //   this.fixedFoods.push(this.pickedFoods[index]);
-  //   console.log(this.pickedFoods[index]);
-  //   this.pickedFoods.splice(index, 1);
+  //   this.chosenFoods.push(this.suggestedFoods[index]);
+  //   console.log(this.suggestedFoods[index]);
+  //   this.suggestedFoods.splice(index, 1);
   // }
 
-  public replaceFixedFood(index: number) {
-    // Remove the fixed food
-    this.fixedFoods.splice(index, 1);
+  public replaceSuggestedFoods() {
+    // Remove the suggested food
+    const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
+    selectedNodes.forEach(node => {
+      const data: Food = node.data;
+      const index = this.chosenFoods.findIndex((f) => f.id === data.id)
+      if (index) {
+        this.chosenFoods.splice(index, 1);
+      }
+    });
 
     // Add another random food to picked foods
-    this.pickedFoods.push(this.getRandomValidFood());
+    this.suggestedFoods.push(this.getRandomValidFood());
 
     this.recalculateNumbers();
     this.recalculateFoods();
@@ -311,10 +314,10 @@ export class AppComponent implements OnInit {
 
   public replaceFood(index: number) {
     // Remove the food from the list
-    this.pickedFoods.splice(index, 1);
+    this.suggestedFoods.splice(index, 1);
 
     // Add another random food
-    this.pickedFoods.push(this.getRandomValidFood());
+    this.suggestedFoods.push(this.getRandomValidFood());
 
     this.recalculateNumbers();
     this.recalculateFoods();
@@ -322,37 +325,37 @@ export class AppComponent implements OnInit {
 
   public removeFood(index: number) {
     // Remove the food from the list
-    this.pickedFoods.splice(index, 1);
+    this.suggestedFoods.splice(index, 1);
 
     this.recalculateNumbers();
     this.recalculateFoods();
   }
 
   public onClickPickedFood(index: number) {
-    const url = this.pickedFoods[index].url;
+    const url = this.suggestedFoods[index].url;
     window.open(url, '_blank');
   }
 
   public onClickFixedFood(index: number) {
-    const url = this.fixedFoods[index].url;
+    const url = this.chosenFoods[index].url;
     window.open(url, '_blank');
   }
 
   public notAvailable() {
     // Set the food availability to false and remove the food from the list
-    const selectedNodes = this.agGridPickedFoods.api.getSelectedNodes()
+    const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes()
     selectedNodes.forEach(node => {
       const data: Food = node.data;
-      const index = this.pickedFoods.findIndex((f) => f.id === data.id)
+      const index = this.suggestedFoods.findIndex((f) => f.id === data.id)
       if (index) {
-        this.pickedFoods[index].available = false;
-        this.pickedFoods.splice(index, 1);
+        this.suggestedFoods[index].available = false;
+        this.suggestedFoods.splice(index, 1);
       }
 
-      const index2 = this.fixedFoods.findIndex((f) => f.id === data.id)
+      const index2 = this.chosenFoods.findIndex((f) => f.id === data.id)
       if (index2) {
-        this.fixedFoods[index2].available = false;
-        this.fixedFoods.splice(index2, 1);
+        this.chosenFoods[index2].available = false;
+        this.chosenFoods.splice(index2, 1);
       }
 
       const index3 = this.matchingFoods.findIndex((f) => f.id === data.id)
@@ -365,16 +368,16 @@ export class AppComponent implements OnInit {
 
 
 
-    // const food = this.pickedFoods[index];
+    // const food = this.suggestedFoods[index];
     // food.totalCalories
     // const foodsIndex = this.foods.findIndex((element) => element.id == food.id);
     // this.foods[foodsIndex].available = false;
 
     // Remove the food from the picked foods list
-    // this.pickedFoods.splice(index, 1);
+    // this.suggestedFoods.splice(index, 1);
 
     // Replace with a random food
-    this.pickedFoods.push(this.getRandomValidFood());
+    this.suggestedFoods.push(this.getRandomValidFood());
 
     this.recalculateNumbers();
     this.recalculateFoods();
@@ -385,15 +388,15 @@ export class AppComponent implements OnInit {
     this.matchingFoods = this.foods.filter((element) => element[0].includes(name));
   }
 
-  public onClickMatchingFood(index: number) {
-    const url = this.matchingFoods[index].url;
-    window.open(url, '_blank');
-  }
+  // public onClickMatchingFood(index: number) {
+  //   const url = this.matchingFoods[index].url;
+  //   window.open(url, '_blank');
+  // }
 
   public addMatchingFood(index: number) {
     let food = this.matchingFoods[index];
     console.log('matchingFood: ', food);
-    this.fixedFoods.push(food);
+    this.chosenFoods.push(food);
 
     this.recalculateNumbers();
     this.recalculateFoods();
@@ -403,8 +406,8 @@ export class AppComponent implements OnInit {
 
   rowData: Observable<any[]>;
   @ViewChild('agGridMatchingFoods') agGridMatchingFoods!: AgGridAngular;
-  @ViewChild('agGridFixedFoods') agGridFixedFoods!: AgGridAngular;
-  @ViewChild('agGridPickedFoods') agGridPickedFoods!: AgGridAngular;
+  @ViewChild('agGridChosenFoods') agGridChosenFoods!: AgGridAngular;
+  @ViewChild('agGridSuggestedFoods') agGridSuggestedFoods!: AgGridAngular;
 
   defaultColDef: ColDef = {
     flex: 1,
@@ -445,7 +448,7 @@ export class AppComponent implements OnInit {
   // };
 
   getSelectedRows(): void {
-        const selectedNodes = this.agGridPickedFoods.api.getSelectedNodes();
+        const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
         const selectedData = selectedNodes.map(node => {
           if (node.groupData) {
             return { make: node.key, model: 'Group' };

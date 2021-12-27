@@ -11,12 +11,12 @@
   groupSelectsChildren 
 >
 </ag-grid-angular>
-<h2>Fixed Foods</h2>
+<h2>Chosen Foods</h2>
 <ag-grid-angular
-  #agGridFixedFoods
+  #agGridChosenFoods
   [defaultColDef]="defaultColDef"
   class="ag-theme-alpine"
-  [rowData]="fixedFoods"
+  [rowData]="chosenFoods"
   [columnDefs]="columnDefs"
   rowSelection="multiple"
   [gridOptions]="gridOptions"
@@ -26,10 +26,10 @@
 </ag-grid-angular>
 <h2>Suggested Foods</h2>
 <ag-grid-angular
-  #agGridPickedFoods
+  #agGridSuggestedFoods
   [defaultColDef]="defaultColDef"
   class="ag-theme-alpine"
-  [rowData]="pickedFoods"
+  [rowData]="suggestedFoods"
   [columnDefs]="columnDefs"
   rowSelection="multiple"
   [gridOptions]="gridOptions"
@@ -41,11 +41,13 @@
 <div class="content" role="main">
 
   <input id="preview" type="file" (change)="previewFile($event.target.files)" />
-  <button (click)="pickFoods()">Pick Foods</button>
-  <button (click)="addRandomFood()">Add Food</button>
-  <button (click)="clearPickedFoods()">Clear Picked Foods</button>
-  <button (click)="fixFoods()">Fix Foods</button>
-  <button (click)="notAvailable()">Not Available</button>
+  <button (click)="pickSuggestedFoods()">Suggest Foods</button>
+  <button (click)="addRandomFood()">Add Suggested Food</button>
+  <button (click)="clearSuggestedFoods()">Clear Suggested Foods</button>
+  <button (click)="chooseFoods()">Choose Selected Foods</button>
+  <button (click)="notAvailable()">Foods Not Available</button>
+  <button (click)="replaceSuggestedFoods()">Replace Suggested Foods</button>
+  
   <input type="search" [(ngModel)]="search"><button (click)="searchFood(search)">Search</button>
 
   <table class="table table-bordered table-dark mt-5">
@@ -83,7 +85,7 @@
       </tr>
       <tr>//////////////////////////////////////////////////////////////////////////////////////////////////////////////
       </tr>
-      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of fixedFoods; let i = index">
+      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of chosenFoods; let i = index">
         <td><a (click)="onClickFixedFood(i)">{{food.name}}</a></td>
         <td>{{food.proteinPer100Calorie | number : '1.2-2'}}</td>
         <td>{{food.price}}</td>
@@ -91,7 +93,7 @@
         <td>{{food.totalProtein | number : '1.2-2'}}</td>
         <td>{{food.poundsPer1000Calories | number : '1.2-2'}}</td>
         <td>{{food.rankWeighting | number : '1.0-0'}}</td>
-        <td><input type="checkbox" (change)="replaceFixedFood(i)"></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -99,7 +101,7 @@
       </tr>
       <tr>//////////////////////////////////////////////////////////////////////////////////////////////////////////////
       </tr>
-      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of pickedFoods; let i = index">
+      <tr [ngClass]="{'rated-before' : food.rankWeighting != 0}" *ngFor="let food of suggestedFoods; let i = index">
         <td><a class="clickable" (click)="onClickPickedFood(i)">{{food.name}}</a></td>
         <td>{{food.proteinPer100Calorie | number : '1.2-2'}}</td>
         <td>{{food.price}}</td>
