@@ -280,12 +280,17 @@ export class AppComponent implements OnInit {
 
   public chooseFoods() {
     const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
-    const selectedData = selectedNodes.map(node => {
+    const selectedData: Food[] = selectedNodes.map(node => {
       return node.data;
     });
 
+    selectedData.forEach(data => {
+      const index = this.suggestedFoods.findIndex(f => data.id === f.id)
+      this.suggestedFoods.splice(index, 1);
+    })
+
     this.agGridChosenFoods.api.setRowData(selectedData);
-    // this.agGridSuggestedFoods.api
+    this.agGridSuggestedFoods.api.removeItems(selectedNodes);
   }
 
   // public fixFood(index: number) {
