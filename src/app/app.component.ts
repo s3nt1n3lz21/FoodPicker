@@ -337,15 +337,40 @@ export class AppComponent implements OnInit {
     window.open(url, '_blank');
   }
 
-  public notAvailable(index: number) {
-    // Set the food availability to false
-    const food = this.pickedFoods[index];
-    food.totalCalories
-    const foodsIndex = this.foods.findIndex((element) => element.id == food.id);
-    this.foods[foodsIndex].available = false;
+  public notAvailable() {
+    // Set the food availability to false and remove the food from the list
+    const selectedNodes = this.agGridPickedFoods.api.getSelectedNodes()
+    selectedNodes.forEach(node => {
+      const data: Food = node.data;
+      const index = this.pickedFoods.findIndex((f) => f.id === data.id)
+      if (index) {
+        this.pickedFoods[index].available = false;
+        this.pickedFoods.splice(index, 1);
+      }
+
+      const index2 = this.fixedFoods.findIndex((f) => f.id === data.id)
+      if (index2) {
+        this.fixedFoods[index2].available = false;
+        this.fixedFoods.splice(index2, 1);
+      }
+
+      const index3 = this.matchingFoods.findIndex((f) => f.id === data.id)
+      if (index3) {
+        this.matchingFoods[index3].available = false;
+        this.matchingFoods.splice(index3, 1);
+      }
+    });
+    
+
+
+
+    // const food = this.pickedFoods[index];
+    // food.totalCalories
+    // const foodsIndex = this.foods.findIndex((element) => element.id == food.id);
+    // this.foods[foodsIndex].available = false;
 
     // Remove the food from the picked foods list
-    this.pickedFoods.splice(index, 1);
+    // this.pickedFoods.splice(index, 1);
 
     // Replace with a random food
     this.pickedFoods.push(this.getRandomValidFood());

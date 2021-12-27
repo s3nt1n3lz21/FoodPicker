@@ -42,6 +42,7 @@
   <button (click)="addRandomFood()">Add Food</button>
   <button (click)="clearPickedFoods()">Clear Picked Foods</button>
   <button (click)="fixFoods()">Fix Foods</button>
+  <button (click)="notAvailable()">Not Available</button>
   <input type="search" [(ngModel)]="search"><button (click)="searchFood(search)">Search</button>
 
   <table class="table table-bordered table-dark mt-5">
@@ -104,9 +105,9 @@
         <td>{{food.poundsPer1000Calories | number : '1.2-2'}}</td>
         <td>{{food.rankWeighting | number : '1.0-0'}}</td>
         <td><input type="checkbox" (change)="replaceFood(i)"></td>
-        <td><input type="checkbox" (change)="fixFood(i)"></td>
+        <td></td>
         <td><input type="checkbox" (change)="removeFood(i)"></td>
-        <td><input type="checkbox" (change)="notAvailable(i)"></td>
+        <td></td>
         <td></td>
       </tr>
     </tbody>
