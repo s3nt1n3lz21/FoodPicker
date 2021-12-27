@@ -11,10 +11,7 @@ import { ApiService } from 'src/app/services/api.service';
 export class AddFoodComponent implements OnInit {
 
   // Component State
-  public questionForm: IFoodForm = this.fb.group({
-    question: '',
-    answer: '',
-  });
+  public questionForm: IFoodForm = this.fb.group(emptyFood());
 
   constructor(
     private fb: FormBuilder,
@@ -29,11 +26,16 @@ export class AddFoodComponent implements OnInit {
     const foodFormValues = this.questionForm.value;
     food.name = foodFormValues.name;
     food.url = foodFormValues.url;
-    food.totalCalories = foodFormValues.totalCalories;
-    food.totalProtein = foodFormValues.totalProtein;
-    food.rankWeighting = foodFormValues.rankWeighting;
-    food.timesEaten = foodFormValues.timesEaten;
-    food.price = foodFormValues.price;
+    food.totalCalories = Number(foodFormValues.totalCalories);
+    food.totalProtein = Number(foodFormValues.totalProtein);
+    food.rankWeighting = Number(foodFormValues.rankWeighting);
+    food.timesEaten = Number(foodFormValues.timesEaten);
+    food.price = Number(foodFormValues.price);
+
+    food.proteinPer100Calorie = Number((food.totalProtein/food.totalCalories)*100);
+    food.poundsPer1000Calories = Number((food.price/food.totalCalories)*1000);
+    
+    console.log(food);
     this.apiService.addFood(food).subscribe(
       () => {
         console.log('Added food');
@@ -43,25 +45,4 @@ export class AddFoodComponent implements OnInit {
       }
     );
   }
-
-
-  // extractedPrice: '',
-  // pricePerAmount: '',
-  // extractedProteinPer100g: '',
-  // extractedKJPer100g: '',
-  // proteinPer100g: 0,
-  // kJPer100g: 0,
-  // caloriesPer100g: 0,
-  // proteinPer100Calorie: 0,
-  // poundsPerAsString: '',
-  // poundsPer: 0,
-  // perAmount: '',
-  // poundsPer100g: 0,
-  // multiplesOf100g: 0,
-  // perEachPer100g: 0,
-  // totalCalories: 0,
-  // totalProtein: 0,
-  // rankWeighting: 0,
-  // poundsPer1000Calories: 0,
-  // ignore: false,
 }
