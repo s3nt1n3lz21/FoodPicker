@@ -1,6 +1,8 @@
-import { ReadVarExpr } from '@angular/compiler';
-import { Component, OnInit } from '@angular/core';
-import { FoodsService } from './foods.service';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, GridOptions, RowClassRules } from 'ag-grid-community';
+import { Observable } from 'rxjs';
 import { AddFood, emptyAddFood, emptyFood, Food } from './model/IFood';
 import { ApiService } from './services/api.service';
 
@@ -29,7 +31,9 @@ export class AppComponent implements OnInit {
   daysFood = 0;
   ignoreIndex = -1;
 
-  constructor(private apiService: ApiService) { 
+  constructor(private apiService: ApiService,
+    private http: HttpClient) { 
+    // this.rowData = this.http.get<any[]>('https://www.ag-grid.com/example-assets/row-data.json');
   }
 
   ngOnInit() {
@@ -47,7 +51,11 @@ export class AppComponent implements OnInit {
         }
   
         this.foods = foods;
+        // this.rowData = this.foods
         console.log('this.foods: ', this.foods);
+        this.agGridPickedFoods.api.sizeColumnsToFit();
+        this.agGridMatchingFoods.api.sizeColumnsToFit();
+        this.agGridFixedFoods.api.sizeColumnsToFit();
         // Set all the foods to available
         this.foods.forEach((food) => food.available = true);
       },
@@ -153,6 +161,8 @@ export class AppComponent implements OnInit {
     this.recalculateNumbers();
 
     this.recalculateFoods();
+
+    this.agGridPickedFoods.api.setRowData(this.pickedFoods);
   }
 
   // Keep replacing foods until conditions met
@@ -271,11 +281,21 @@ export class AppComponent implements OnInit {
     return totalPrice;
   }
 
-  public fixFood(index: number) {
-    this.fixedFoods.push(this.pickedFoods[index]);
-    console.log(this.pickedFoods[index]);
-    this.pickedFoods.splice(index, 1);
+  public fixFoods() {
+    const selectedNodes = this.agGridPickedFoods.api.getSelectedNodes();
+    const selectedData = selectedNodes.map(node => {
+      return node.data;
+    });
+
+    this.agGridFixedFoods.api.setRowData(selectedData);
+    // this.agGridPickedFoods.api
   }
+
+  // public fixFood(index: number) {
+  //   this.fixedFoods.push(this.pickedFoods[index]);
+  //   console.log(this.pickedFoods[index]);
+  //   this.pickedFoods.splice(index, 1);
+  // }
 
   public replaceFixedFood(index: number) {
     // Remove the fixed food
@@ -320,6 +340,7 @@ export class AppComponent implements OnInit {
   public notAvailable(index: number) {
     // Set the food availability to false
     const food = this.pickedFoods[index];
+    food.totalCalories
     const foodsIndex = this.foods.findIndex((element) => element.id == food.id);
     this.foods[foodsIndex].available = false;
 
@@ -351,6 +372,68 @@ export class AppComponent implements OnInit {
     this.recalculateNumbers();
     this.recalculateFoods();
   }
+
+  //////////////////////////////////////
+
+  rowData: Observable<any[]>;
+  @ViewChild('agGridMatchingFoods') agGridMatchingFoods!: AgGridAngular;
+  @ViewChild('agGridFixedFoods') agGridFixedFoods!: AgGridAngular;
+  @ViewChild('agGridPickedFoods') agGridPickedFoods!: AgGridAngular;
+
+  defaultColDef: ColDef = {
+    flex: 1,
+    sortable: true,
+    filter: true,
+  };
+
+  columnDefs: ColDef[] = [
+    { field: 'name', minWidth: 300, checkboxSelection: true },
+    { field: 'proteinPer100Calorie'},
+    { field: 'totalCalories'},
+    { field: 'totalProtein'},
+    { field: 'poundsPer1000Calories'},
+    { field: 'rankWeighting'},
+    // { field: 'make', rowGroup: true },
+    { field: 'price' }
+  ];
+
+  gridOptions: GridOptions = {
+    rowClassRules: {
+      'rated-before': params => params.api.getValue('rankWeighting', params.node) != 0,
+    }
+  }
+
+
+
+  // autoGroupColumnDef: ColDef = {
+  //     headerName: 'Model',
+  //     field: 'model',
+  //     cellRenderer: 'agGroupCellRenderer',
+  //     cellRendererParams: {
+  //         checkbox: true
+  //     }
+  // };
+
+  getSelectedRows(): void {
+        const selectedNodes = this.agGridPickedFoods.api.getSelectedNodes();
+        const selectedData = selectedNodes.map(node => {
+          if (node.groupData) {
+            return { make: node.key, model: 'Group' };
+          }
+          return node.data;
+        });
+        const selectedDataStringPresentation = selectedData.map(node => `${node.make} ${node.model}`).join(', ');
+
+        alert(`Selected nodes: ${selectedDataStringPresentation}`);
+  }
+
+
+
+
+
+
+
+
 }
 
 // TODO
