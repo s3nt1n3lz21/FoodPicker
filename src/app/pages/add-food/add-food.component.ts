@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { emptyFood, IFoodForm } from 'src/app/model/IFood';
+import { AddFood, emptyAddFood, emptyFood, IFoodForm } from 'src/app/model/IFood';
 import { ApiService } from 'src/app/services/api.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class AddFoodComponent implements OnInit {
   }
 
   addFood = () => {
-    const food = emptyFood();
+    const food: AddFood = emptyAddFood();
     const foodFormValues = this.questionForm.value;
     food.name = foodFormValues.name;
     food.url = foodFormValues.url;

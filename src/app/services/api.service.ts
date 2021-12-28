@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Food, AddFood, emptyAddFood } from '../model/IFood';
+import { Food, AddFood, emptyAddFood, convertFoodToAddFood } from '../model/IFood';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class ApiService {
   }
 
   updateFood(food: Food) {
-    const foodWithoutID: AddFood = { ...emptyAddFood(), ...food };
+    const foodWithoutID: AddFood = convertFoodToAddFood(food);
 
     return this.http.put(
       //?auth=${this.token}
@@ -29,10 +29,11 @@ export class ApiService {
     )
   }
 
-  addFood(food: AddFood) {
+  addFood(foodWithoutID: AddFood) {
+
     return this.http.post(
       `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods.json`,
-      JSON.stringify(food),
+      JSON.stringify(foodWithoutID),
       {
         headers: {
           'Content-Type': 'application/json',

@@ -90,6 +90,35 @@ export function emptyAddFood(): AddFood {
     }
   }
 
+export function convertFoodToAddFood(food: Food): AddFood {
+    const result: AddFood = emptyAddFood();
+    result.name = food.name;
+    result.url = food.url;
+    result.extractedPrice = food.extractedPrice;
+    result.pricePerAmount = food.pricePerAmount;
+    result.extractedProteinPer100g = food.extractedProteinPer100g;
+    result.extractedKJPer100g = food.extractedKJPer100g;
+    result.proteinPer100g = food.proteinPer100g;
+    result.kJPer100g = food.kJPer100g;
+    result.caloriesPer100g = food.caloriesPer100g;
+    result.proteinPer100Calorie = food.proteinPer100Calorie;
+    result.poundsPerAsString = food.poundsPerAsString;
+    result.poundsPer = food.poundsPer;
+    result.perAmount = food.perAmount;
+    result.poundsPer100g = food.poundsPer100g;
+    result.price = food.price;
+    result.multiplesOf100g = food.multiplesOf100g;
+    result.perEachPer100g = food.perEachPer100g;
+    result.totalCalories = food.totalCalories;
+    result.totalProtein = food.totalProtein;
+    result.rankWeighting = food.rankWeighting;
+    result.timesEaten = food.timesEaten;
+    result.poundsPer1000Calories = food.poundsPer1000Calories;
+    result.ignore = food.ignore;
+    result.available = food.available;
+    return result;
+}
+
 // export interface IQuestionFormValues extends Food {
 
 // }

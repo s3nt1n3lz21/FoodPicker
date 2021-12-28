@@ -54,6 +54,7 @@ export class FoodListComponent implements OnInit {
         }
   
         this.foods = foods;
+        console.log(this.foods);
 
         this.agGridSuggestedFoods.api.sizeColumnsToFit();
         this.agGridMatchingFoods.api.sizeColumnsToFit();
@@ -113,12 +114,9 @@ export class FoodListComponent implements OnInit {
           }
         }
 
-        
-
-
-        // newFoods.forEach(food => {
-        //   this.apiService.addFood(food).subscribe(() => {});
-        // })
+        newFoods.forEach(food => {
+          this.apiService.addFood(food).subscribe(() => {});
+        })
       }
     }
   }
@@ -151,6 +149,7 @@ export class FoodListComponent implements OnInit {
     let limit = 0;
     while (this.totalPrice < 40 && limit < 100) {
       const food = this.getRandomValidFood();
+      console.log('suggested food: ', food);
       this.suggestedFoods.push(food);
       allPickedFoods = this.suggestedFoods.concat(this.chosenFoods);
       this.totalPrice = this.getTotalPrice(allPickedFoods);
