@@ -13,6 +13,10 @@
 ag-grid-angular {
     width: 100%; 
     height: 25vh;
+
+    &.short-grid {
+        height: 15vh;
+    }
 }
 
 button {
