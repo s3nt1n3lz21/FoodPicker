@@ -11,6 +11,8 @@ import { RankingRendererComponent } from './ag-grid/renderers/ranking-renderer/r
 import { HeaderComponent } from './pages/header/header.component';
 import { FoodListComponent } from './pages/food-list/food-list.component';
 import { AddFoodComponent } from './pages/add-food/add-food.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ToastComponent } from './toast/toast/toast.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,8 @@ import { AddFoodComponent } from './pages/add-food/add-food.component';
     RankingRendererComponent,
     HeaderComponent,
     FoodListComponent,
-    AddFoodComponent
+    AddFoodComponent,
+    ToastComponent
   ],
   imports: [
     BrowserModule,
@@ -27,6 +30,7 @@ import { AddFoodComponent } from './pages/add-food/add-food.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    NgbModule,
     AgGridModule.withComponents([NameRendererComponent, RankingRendererComponent]),
   ],
   providers: [],
