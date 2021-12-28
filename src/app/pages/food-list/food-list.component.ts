@@ -383,6 +383,7 @@ export class FoodListComponent implements OnInit {
     flex: 1,
     sortable: true,
     filter: true,
+    resizable: true
   };
 
   columnDefs: ColDef[] = [
