@@ -13,6 +13,11 @@ import { FoodListComponent } from './pages/food-list/food-list.component';
 import { AddFoodComponent } from './pages/add-food/add-food.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastComponent } from './toast/toast/toast.component';
+import { LoginComponent } from './pages/login/login.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -22,7 +27,8 @@ import { ToastComponent } from './toast/toast/toast.component';
     HeaderComponent,
     FoodListComponent,
     AddFoodComponent,
-    ToastComponent
+    ToastComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -31,6 +37,10 @@ import { ToastComponent } from './toast/toast/toast.component';
     ReactiveFormsModule,
     HttpClientModule,
     NgbModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    BrowserAnimationsModule,
     AgGridModule.withComponents([NameRendererComponent, RankingRendererComponent]),
   ],
   providers: [],

@@ -33,6 +33,18 @@
             "scripts": []
           },
           "configurations": {
+            "development": {
+              "buildOptimizer": false,
+              "optimization": {
+                "scripts": false,
+                "styles": false,
+                "fonts": false
+              },
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -69,10 +81,14 @@
             "browserTarget": "food-picker:build"
           },
           "configurations": {
+            "development": {
+              "browserTarget": "food-picker:build:development"
+            },
             "production": {
               "browserTarget": "food-picker:build:production"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",

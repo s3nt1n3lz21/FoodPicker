@@ -169,7 +169,7 @@ export class FoodListComponent implements OnInit {
     const maxLoops = 1000;
     let numLoops = 0;
     let maxProtein = 2.2 * 58;
-    while ((this.totalProteinPerDay < 80 || this.daysFood < 7) && numLoops < maxLoops) {
+    while ((this.totalProteinPerDay < maxProtein || this.daysFood < 7) && numLoops < maxLoops) {
       // get lowest protein food and replace with random food
       const lowestIndex = this.findLowestProteinFood(this.suggestedFoods);
       this.suggestedFoods[lowestIndex] = this.getRandomValidFood();
