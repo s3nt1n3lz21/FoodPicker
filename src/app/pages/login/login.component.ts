@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { emptyLoginDetails, ILoginForm, LoginDetails } from 'src/app/model/ILogin';
+import { NotificationService } from 'src/app/notification.service';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -19,7 +20,8 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) { }
 
   onSwitchMode() {
@@ -35,6 +37,16 @@ export class LoginComponent {
     
     if (this.isLoginMode) {
 
+      // this.authService.login(userLoginDetails.email, userLoginDetails.password).subscribe(
+      //   (response) => {
+      //     console.log(response)
+      //     this.loginForm.reset();
+      //   },
+      //   (error) => {
+      //     console.error(error);
+      //   }
+      // )
+
     } else {
 
       this.authService.signUp(userLoginDetails.email, userLoginDetails.password).subscribe(
@@ -43,7 +55,11 @@ export class LoginComponent {
           this.loginForm.reset();
         },
         (error) => {
-          console.error(error);
+          if (error.error.code === 400) {
+            this.notificationService.error(error, "Failed To Sign Up", "Email Already Exists");
+          } else {
+            this.notificationService.error(error);
+          }
         }
       )
     }

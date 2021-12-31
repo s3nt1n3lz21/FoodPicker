@@ -17,7 +17,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  signUp(email: string, password: string): Observable<AuthResponseData> {
+  signUp = (email: string, password: string): Observable<AuthResponseData> => {
     return this.http.post<AuthResponseData>(
       "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + "AIzaSyDVqBqQITM-4fpJSPPGHNWIl-O62IbyYg0",
       {
@@ -27,4 +27,6 @@ export class AuthService {
       }
     )
   }
+
+  login = () => {}
 }

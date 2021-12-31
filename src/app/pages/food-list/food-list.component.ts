@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridOptions } from 'ag-grid-community';
+import { until } from 'protractor';
 import { Observable } from 'rxjs';
 import { NameRendererComponent } from 'src/app/ag-grid/renderers/name-renderer/name-renderer.component';
 import { RankingRendererComponent } from 'src/app/ag-grid/renderers/ranking-renderer/ranking-renderer.component';
@@ -63,8 +64,7 @@ export class FoodListComponent implements OnInit {
         this.agGridSuggestedFoods.api.sizeColumnsToFit();
         this.agGridMatchingFoods.api.sizeColumnsToFit();
         this.agGridChosenFoods.api.sizeColumnsToFit();
-        // Set all the foods to available
-        this.foods.forEach((food) => food.available = true);
+
       },
       (error) => {
         console.error(error);
@@ -153,7 +153,6 @@ export class FoodListComponent implements OnInit {
     let limit = 0;
     while (this.totalPrice < 40 && limit < 100) {
       const food = this.getRandomValidFood();
-      console.log('suggested food: ', food);
       this.suggestedFoods.push(food);
       allPickedFoods = this.suggestedFoods.concat(this.chosenFoods);
       this.totalPrice = this.getTotalPrice(allPickedFoods);
@@ -164,6 +163,8 @@ export class FoodListComponent implements OnInit {
 
     this.recalculateFoods();
 
+    console.log('suggested foods: ', this.suggestedFoods);
+
     this.agGridSuggestedFoods.api.setRowData(this.suggestedFoods);
   }
 
@@ -172,7 +173,8 @@ export class FoodListComponent implements OnInit {
     // If total protein < 120g per day
     const maxLoops = 1000;
     let numLoops = 0;
-    let maxProtein = 2.2 * 58;
+    // let maxProtein = 2.2 * 58;
+    let maxProtein = 2.2 * 40;
     while ((this.totalProteinPerDay < maxProtein || this.daysFood < 7) && numLoops < maxLoops) {
       // get lowest protein food and replace with random food
       const lowestIndex = this.findLowestProteinFood(this.suggestedFoods);
@@ -181,6 +183,10 @@ export class FoodListComponent implements OnInit {
       this.recalculateNumbers();
 
       numLoops += 1;
+    }
+
+    if (numLoops === maxLoops) {
+      console.log('Failed to follow conditions');
     }
   }
 
@@ -208,6 +214,10 @@ export class FoodListComponent implements OnInit {
       poundsPer1000Calorie = food.poundsPer1000Calories;
       rank = food.rankWeighting*1;
       limit += 1;
+    }
+
+    if (limit === 20000) {
+      console.log('failed to follow conditions');
     }
 
     return food;
@@ -361,10 +371,7 @@ export class FoodListComponent implements OnInit {
     const selectedNodes = this.agGridMatchingFoods.api.getSelectedNodes();
     selectedNodes.forEach(node => {
       const food: Food = node.data;
-      const index = this.matchingFoods.findIndex((f) => f.id === food.id)
-      if (index) {
-        this.chosenFoods.push(food);
-      }
+      this.chosenFoods.push(food);
     });
 
     this.agGridChosenFoods.api.setRowData(this.chosenFoods);
@@ -414,12 +421,13 @@ export class FoodListComponent implements OnInit {
     },
     onCellEditingStopped: (event) => {
       const DAY = 86400000; // 1 day in milliseconds
-      const food = event.node.data;
+      const food: Food = event.node.data;
 
       if (event.column.getColId() === "available") {
         console.log('event.column: ', event.column);
         if (event.oldValue) {
           food.availableExpiry = new Date(Date.now() + 6*DAY).toISOString();
+          food.available = false;
         }
       }
 
