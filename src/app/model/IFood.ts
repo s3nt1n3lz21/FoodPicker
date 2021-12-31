@@ -25,6 +25,7 @@ export interface AddFood {
     poundsPer1000Calories: number;
     ignore: boolean;
     available: boolean;
+    availableExpiry: string;
 }
 
 export interface Food extends AddFood {
@@ -57,6 +58,7 @@ export function emptyAddFood(): AddFood {
         poundsPer1000Calories: 0,
         ignore: false,
         available: true,
+        availableExpiry: new Date().toISOString(),
     }
   }
 
@@ -86,6 +88,7 @@ export function emptyAddFood(): AddFood {
         poundsPer1000Calories: 0,
         ignore: false,
         available: true,
+        availableExpiry: new Date().toISOString(),
         id: '',
     }
   }
@@ -116,6 +119,7 @@ export function convertFoodToAddFood(food: Food): AddFood {
     result.poundsPer1000Calories = food.poundsPer1000Calories;
     result.ignore = food.ignore;
     result.available = food.available;
+    result.availableExpiry = food.availableExpiry;
     return result;
 }
 

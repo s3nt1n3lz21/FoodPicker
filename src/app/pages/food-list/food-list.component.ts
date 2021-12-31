@@ -50,6 +50,10 @@ export class FoodListComponent implements OnInit {
             ...data[key]
           };
 
+          if (new Date(food.availableExpiry) < new Date()) {
+            food.available = true;
+          }
+
           foods.push(food);
         }
   
@@ -396,6 +400,7 @@ export class FoodListComponent implements OnInit {
     { field: 'price' },
     { field: 'timesEaten', editable: true, cellRenderer: "timesEatenRenderer" },
     { field: 'ignore', editable: true },
+    { field: 'available', editable: true },
   ];
 
   frameworkComponents = {
@@ -408,7 +413,16 @@ export class FoodListComponent implements OnInit {
       'rated-before': params => params.api.getValue('rankWeighting', params.node) != 0,
     },
     onCellEditingStopped: (event) => {
+      const DAY = 86400000; // 1 day in milliseconds
       const food = event.node.data;
+
+      if (event.column.getColId() === "available") {
+        console.log('event.column: ', event.column);
+        if (event.oldValue) {
+          food.availableExpiry = new Date(Date.now() + 6*DAY).toISOString();
+        }
+      }
+
       this.apiService.updateFood(food).subscribe(
         () => {
           console.log('food updated');
