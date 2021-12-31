@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import "ag-grid-community/src/styles/ag-grid.scss";
 @import "ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin.scss";
+@import "./app/theme.scss";
 
 .ag-theme-alpine {
     @include ag-theme-alpine((
@@ -19,13 +20,7 @@ ag-grid-angular {
     }
 }
 
-button {
-    min-width: 100px;
-    min-height: 50px;
-    background-color: #49acd6;
-}
-
-button:hover {
-    cursor: pointer;
-    background-color: #3700ff,
+router-outlet + * {
+    height: 100%;
+    width: 100%;
 }

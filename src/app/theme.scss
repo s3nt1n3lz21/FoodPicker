@@ -3,5 +3,44 @@
 @import './default-components.scss';
 @import './placeholders.scss';
 
+.center {
+    @extend %center;
+}
+
+.space-around {
+    @extend %space-around;
+}
+
+.card {
+    @extend %size-80;
+    @extend %center;
+    @extend %card;
+    @extend %padding;
+}
+
+.input-container {
+    @extend %left;
+    @extend %column;
+    @extend %padding;
+}
+
+.input {
+    @extend %width-100;
+}
+
+.column {
+    @extend %column;
+}
+
+button {
+    min-width: 50px;
+    min-height: 25px;
+    background-color: #49acd6;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: #3700ff,
+}
 
 

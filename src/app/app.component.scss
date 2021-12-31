@@ -8,10 +8,13 @@
 .header {
     display: flex;
     width: 100%;
-    min-height: 100px;
+    height: 100px;
     position: sticky;
 }
 
 .body {
-    min-height: calc(100vh - 200px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 100px);
 }
