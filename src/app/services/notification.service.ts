@@ -12,11 +12,12 @@ export class NotificationService {
   error = (error: HttpErrorResponse, title?: string, message?: string) => {
     if (!title && !message) {
       console.error(error);
+    } else {
+      console.error(title + message);
     }
     
-    console.error(title, message);
     this.consoleService.error(error);
   }
-  
+
   success = () => {}
 }

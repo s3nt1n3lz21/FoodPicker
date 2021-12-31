@@ -5,9 +5,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ConsoleService {
-  
+
   error(error: HttpErrorResponse) {
-    throw new Error('Method not implemented.');
+    
   }
 
   constructor() { }

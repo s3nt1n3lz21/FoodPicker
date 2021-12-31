@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { emptyLoginDetails, ILoginForm, LoginDetails } from 'src/app/model/ILogin';
-import { NotificationService } from 'src/app/notification.service';
+import { NotificationService } from 'src/app/services/notification.service';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -13,7 +13,8 @@ import { AuthService } from 'src/app/services/auth.service';
   // }
 })
 export class LoginComponent {
-  isLoginMode = true;
+  isLoginMode: boolean = true;
+  isLoading: boolean = false;
 
   // Component State
   public loginForm: ILoginForm = this.fb.group(emptyLoginDetails());
@@ -36,23 +37,27 @@ export class LoginComponent {
     const userLoginDetails: LoginDetails = this.loginForm.value;
     
     if (this.isLoginMode) {
-
+      // this.isLoading = true;
       // this.authService.login(userLoginDetails.email, userLoginDetails.password).subscribe(
       //   (response) => {
       //     console.log(response)
       //     this.loginForm.reset();
+      //     this.isLoading = false;
       //   },
       //   (error) => {
       //     console.error(error);
+      //     this.isLoading = false;
       //   }
       // )
 
-    } else {
 
+    } else {
+      this.isLoading = true;
       this.authService.signUp(userLoginDetails.email, userLoginDetails.password).subscribe(
         (response) => {
           console.log(response)
           this.loginForm.reset();
+          this.isLoading = false;
         },
         (error) => {
           if (error.error.code === 400) {
@@ -60,6 +65,7 @@ export class LoginComponent {
           } else {
             this.notificationService.error(error);
           }
+          this.isLoading = false;
         }
       )
     }
