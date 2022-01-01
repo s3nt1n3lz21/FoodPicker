@@ -37,34 +37,27 @@ export class LoginComponent {
     const userLoginDetails: LoginDetails = this.loginForm.value;
     
     if (this.isLoginMode) {
-      // this.isLoading = true;
-      // this.authService.login(userLoginDetails.email, userLoginDetails.password).subscribe(
-      //   (response) => {
-      //     console.log(response)
-      //     this.loginForm.reset();
-      //     this.isLoading = false;
-      //   },
-      //   (error) => {
-      //     console.error(error);
-      //     this.isLoading = false;
-      //   }
-      // )
-
-
-    } else {
       this.isLoading = true;
-      this.authService.signUp(userLoginDetails.email, userLoginDetails.password).subscribe(
+      this.authService.login(userLoginDetails.email, userLoginDetails.password).subscribe(
         (response) => {
           console.log(response)
           this.loginForm.reset();
           this.isLoading = false;
         },
         (error) => {
-          if (error.error.code === 400) {
-            this.notificationService.error(error, "Failed To Sign Up", "Email Already Exists");
-          } else {
-            this.notificationService.error(error);
-          }
+          this.isLoading = false;
+        }
+      )
+
+    } else {
+      this.isLoading = true;
+      this.authService.signUp(userLoginDetails.email, userLoginDetails.password).subscribe(
+        (data) => {
+          console.log(data)
+          this.loginForm.reset();
+          this.isLoading = false;
+        },
+        (error) => {
           this.isLoading = false;
         }
       )
