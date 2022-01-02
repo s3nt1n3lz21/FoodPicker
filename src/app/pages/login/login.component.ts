@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 import { emptyLoginDetails, ILoginForm, LoginDetails } from 'src/app/model/ILogin';
-import { NotificationService } from 'src/app/services/notification.service';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private notificationService: NotificationService
+    private router: Router
   ) { }
 
   onSwitchMode() {
@@ -43,6 +43,7 @@ export class LoginComponent {
           console.log(response)
           this.loginForm.reset();
           this.isLoading = false;
+          this.router.navigate(['/food-list']);
         },
         (error) => {
           this.isLoading = false;
@@ -56,6 +57,7 @@ export class LoginComponent {
           console.log(data)
           this.loginForm.reset();
           this.isLoading = false;
+          this.router.navigate(['/food-list']);
         },
         (error) => {
           this.isLoading = false;

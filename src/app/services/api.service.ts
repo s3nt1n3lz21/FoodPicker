@@ -1,17 +1,32 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { exhaustMap, take } from 'rxjs/operators';
 import { Food, AddFood, emptyAddFood, convertFoodToAddFood } from '../model/IFood';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   getFoods(): Observable<Food[]> {
-    return this.http.get<Food[]>('https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods.json');
+    return this.authService.user.pipe(
+      take(1), 
+      exhaustMap(user => {
+        return this.http.get<Food[]>(
+          'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods.json', 
+          {
+            params: new HttpParams().set('auth', user.token)
+          }
+        );
+      })
+    )
   }
 
   updateFood(food: Food) {
