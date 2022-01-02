@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AgGridModule } from 'ag-grid-angular';
 import 'ag-grid-enterprise';
 import { AppRoutingModule } from './app-routing.module';
@@ -19,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
+import { InterceptorService } from './auth/interceptor.service';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,7 @@ import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinne
     MatFormFieldModule,
     MatInputModule,
     BrowserAnimationsModule,
-    AgGridModule.withComponents([NameRendererComponent, RankingRendererComponent]),
+    AgGridModule.withComponents([NameRendererComponent, RankingRendererComponent, { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }]),
   ],
   providers: [],
   bootstrap: [AppComponent]
