@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User } from '../model/IUser';
@@ -22,10 +23,12 @@ interface SignInResponse extends SignUpResponse {
 })
 export class AuthService {
   user = new BehaviorSubject<User>(null);
+  private tokenExpirationTimer: NodeJS.Timer;
 
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private router: Router
     ) { }
 
   signUp = (email: string, password: string): Observable<SignUpResponse> => {
@@ -52,7 +55,7 @@ export class AuthService {
         }
     ), 
         tap(response => {
-          const expirationDate = new Date(Date.now() + response.expiresIn * 1000)
+          const expirationDate = new Date(Date.now() + response.expiresIn * 1000).toISOString()
           const user = new User(
             response.email, 
             response.localId, 
@@ -60,6 +63,8 @@ export class AuthService {
             expirationDate
           );
           this.user.next(user);
+          this.autoLogout(response.expiresIn * 1000);
+          localStorage.setItem('user', JSON.stringify(user));
         })
     )
 
@@ -88,7 +93,7 @@ export class AuthService {
         }
     ),
         tap(response => {
-          const expirationDate = new Date(Date.now() + response.expiresIn * 1000)
+          const expirationDate = new Date(Date.now() + response.expiresIn * 1000).toISOString();
           const user = new User(
             response.email, 
             response.localId, 
@@ -96,8 +101,37 @@ export class AuthService {
             expirationDate
           );
           this.user.next(user);
+          this.autoLogout(response.expiresIn * 1000);
+          localStorage.setItem('user', JSON.stringify(user));
         })
     )
+  }
+
+  logout = () => {
+    this.user.next(null);
+    this.router.navigate(['/login'])
+    localStorage.removeItem('user');
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer)
+    }
+    this.tokenExpirationTimer = null;
+  }
+
+  autoLogin = () => {
+    const user: User = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+      return;
+    } else {
+      this.user.next(user);
+      const expiresIn = new Date(user.tokenExpiration).getTime() - new Date().getTime();
+      this.autoLogout(expiresIn * 1000);
+    }
+  }
+
+  autoLogout = (timeUntilExpiration: number) => {
+    this.tokenExpirationTimer = setTimeout(() => {
+      this.logout();
+    }, timeUntilExpiration)
   }
 
 }
