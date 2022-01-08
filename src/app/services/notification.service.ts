@@ -14,7 +14,7 @@ export class NotificationService {
       console.error(error);
     } else {
       console.error(title + message);
-    }
+  }
     
     this.consoleService.error(error);
   }

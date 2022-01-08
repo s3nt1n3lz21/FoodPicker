@@ -2,11 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridOptions } from 'ag-grid-community';
-import { until } from 'protractor';
 import { Observable } from 'rxjs';
 import { NameRendererComponent } from 'src/app/ag-grid/renderers/name-renderer/name-renderer.component';
 import { RankingRendererComponent } from 'src/app/ag-grid/renderers/ranking-renderer/ranking-renderer.component';
-import { Food, emptyFood, AddFood, emptyAddFood } from 'src/app/model/IFood';
+import { Food, emptyFood, AddFood, emptyAddFood, convertFoodToAddFood } from 'src/app/model/IFood';
 import { ApiService } from 'src/app/services/api.service';
 
 @Component({
@@ -60,6 +59,35 @@ export class FoodListComponent implements OnInit {
   
         this.foods = foods;
         console.log(this.foods);
+
+        this.agGridSuggestedFoods.api.sizeColumnsToFit();
+        this.agGridMatchingFoods.api.sizeColumnsToFit();
+        this.agGridChosenFoods.api.sizeColumnsToFit();
+
+      },
+      (error) => {
+        console.error(error);
+      }
+    )
+
+    this.apiService.getChosenFoods().subscribe(
+      (data) => {
+        const foods = [];
+        for (const key in data) {
+          const food: Food = {
+            ...emptyFood(),
+            id: key,
+            ...data[key]
+          };
+
+          if (new Date(food.availableExpiry) < new Date()) {
+            food.available = true;
+          }
+
+          foods.push(food);
+        }
+  
+        this.chosenFoods = foods;
 
         this.agGridSuggestedFoods.api.sizeColumnsToFit();
         this.agGridMatchingFoods.api.sizeColumnsToFit();
@@ -138,6 +166,11 @@ export class FoodListComponent implements OnInit {
     this.suggestedFoods = [];
     this.chosenFoods = [];
     this.recalculateNumbers();
+  }
+
+  public clearChosenFoods() {
+    this.chosenFoods = [];
+    this.apiService.clearChosenFoods().subscribe();
   }
 
   public clearSuggestedFoods() {
@@ -288,6 +321,7 @@ export class FoodListComponent implements OnInit {
       const index = this.suggestedFoods.findIndex(f => food.id === f.id);
       this.suggestedFoods.splice(index, 1);
       this.chosenFoods.push(food);
+      this.apiService.addChosenFood(convertFoodToAddFood(food)).subscribe();
     });
 
     this.agGridChosenFoods.api.setRowData(this.chosenFoods);
@@ -372,9 +406,11 @@ export class FoodListComponent implements OnInit {
     selectedNodes.forEach(node => {
       const food: Food = node.data;
       this.chosenFoods.push(food);
+      this.apiService.addChosenFood(convertFoodToAddFood(food)).subscribe();
     });
 
     this.agGridChosenFoods.api.setRowData(this.chosenFoods);
+
 
     this.recalculateNumbers();
     this.recalculateFoods();

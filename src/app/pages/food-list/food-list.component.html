@@ -42,10 +42,10 @@
 
   <input id="preview" type="file" (change)="loadCSV($event.target.files)" />
   <button (click)="pickSuggestedFoods()">Suggest Foods</button>
-  <button (click)="addRandomFood()">Add Suggested Food</button>
+  <button (click)="addRandomFood()">Add Random Food</button>
   <button (click)="clearSuggestedFoods()">Clear Suggested Foods</button>
-  <button (click)="chooseFoods()">Choose Suggested Foods</button>
-  <button (click)="notAvailable()">Foods Not Available</button>
+  <button (click)="chooseFoods()">Add To Chosen Foods</button>
+  <button (click)="clearChosenFoods()">Clear Chosen Foods</button>
   <button (click)="replaceSuggestedFoods()">Replace Suggested Foods</button>
   <button (click)="removeFoods()">Remove Suggested Foods</button>
   <button (click)="addSearchedFoods()">Add Searched Foods</button>

@@ -42,7 +42,7 @@ export class LoginComponent {
         (response) => {
           console.log(response)
           this.loginForm.reset();
-          this.isLoading = false;
+    this.isLoading = false;
           this.router.navigate(['/food-list']);
         },
         (error) => {
