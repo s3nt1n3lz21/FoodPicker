@@ -31,6 +31,8 @@ export class FoodListComponent implements OnInit {
   totalCalories = 0;
   totalProteinPerDay = 0;
 
+  averageReqProteinPerCalorie = 0;
+
   daysFood = 0;
   ignoreIndex = -1;
 
@@ -206,8 +208,9 @@ export class FoodListComponent implements OnInit {
     // If total protein < 120g per day
     const maxLoops = 1000;
     let numLoops = 0;
-    // let maxProtein = 2.2 * 58;
-    let maxProtein = 2.2 * 40;
+    // let maxProtein = 2.2 * 58; 127.6
+    let maxProtein = 100;
+    this.averageReqProteinPerCalorie = (maxProtein/this.caloriesPerDay)*100;
     while ((this.totalProteinPerDay < maxProtein || this.daysFood < 7) && numLoops < maxLoops) {
       // get lowest protein food and replace with random food
       const lowestIndex = this.findLowestProteinFood(this.suggestedFoods);
@@ -421,6 +424,15 @@ export class FoodListComponent implements OnInit {
     // this.chosenFoods.forEach()
   }
 
+  public removeChosenFoods() {
+    const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
+    selectedNodes.forEach(node => {
+      const food: Food = node.data;
+      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.apiService.removeChosenFood(food).subscribe();
+    });
+  }
+
   rowData: Observable<any[]>;
   @ViewChild('agGridMatchingFoods') agGridMatchingFoods!: AgGridAngular;
   @ViewChild('agGridChosenFoods') agGridChosenFoods!: AgGridAngular;
@@ -435,12 +447,12 @@ export class FoodListComponent implements OnInit {
 
   columnDefs: ColDef[] = [
     { field: 'name', editable: true, minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer" },
-    { field: 'proteinPer100Calorie' },
-    { field: 'totalCalories' },
-    { field: 'totalProtein' },
-    { field: 'poundsPer1000Calories' },
+    { field: 'proteinPer100Calorie', editable: true },
+    { field: 'totalCalories', editable: true },
+    { field: 'totalProtein', editable: true },
+    { field: 'poundsPer1000Calories', editable: true },
     { field: 'rankWeighting', editable: true },
-    { field: 'price' },
+    { field: 'price', editable: true },
     { field: 'timesEaten', editable: true, cellRenderer: "timesEatenRenderer" },
     { field: 'ignore', editable: true },
     { field: 'available', editable: true },

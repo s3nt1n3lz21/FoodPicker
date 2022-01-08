@@ -46,10 +46,12 @@
   <button (click)="clearSuggestedFoods()">Clear Suggested Foods</button>
   <button (click)="chooseFoods()">Add To Chosen Foods</button>
   <button (click)="clearChosenFoods()">Clear Chosen Foods</button>
+  <button (click)="removeChosenFoods()">Remove Selected Chosen Foods</button>
   <button (click)="replaceSuggestedFoods()">Replace Suggested Foods</button>
   <button (click)="removeFoods()">Remove Suggested Foods</button>
   <button (click)="addSearchedFoods()">Add Searched Foods</button>
   <input type="search" [(ngModel)]="search"><button (click)="searchFood(search)">Search</button>
 
+  <p>Req Protein Per Calorie: {{averageReqProteinPerCalorie}}</p>
   <p>Total Price: {{totalPrice}} Total Protein Per Day: {{totalProteinPerDay}} Days Food: {{daysFood}}</p>
 </div>

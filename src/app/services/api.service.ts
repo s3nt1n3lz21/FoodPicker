@@ -70,6 +70,19 @@ export class ApiService {
     )
   }
 
+  removeChosenFood(food: Food) {
+
+    return this.http.delete(
+      //?auth=${this.token}
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${food.id}.json`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    )
+  }
+
   // addFoods(foods: AddFood[]): Observable<any> {
   //   const response = new Observable();
   //   foods.forEach((food) => {
