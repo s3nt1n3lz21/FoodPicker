@@ -23,7 +23,7 @@ interface SignInResponse extends SignUpResponse {
 })
 export class AuthService {
   user = new BehaviorSubject<User>(null);
-  private tokenExpirationTimer: NodeJS.Timer;
+  private tokenExpirationTimer: any;
 
   constructor(
     private http: HttpClient,

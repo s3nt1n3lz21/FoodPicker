@@ -434,7 +434,7 @@ export class FoodListComponent implements OnInit {
   };
 
   columnDefs: ColDef[] = [
-    { field: 'name', minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer" },
+    { field: 'name', editable: true, minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer" },
     { field: 'proteinPer100Calorie' },
     { field: 'totalCalories' },
     { field: 'totalProtein' },
