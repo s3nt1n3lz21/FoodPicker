@@ -83,11 +83,22 @@ export class ApiService {
     )
   }
 
-  // addFoods(foods: AddFood[]): Observable<any> {
-  //   const response = new Observable();
-  //   foods.forEach((food) => {
-  //     this.addFood(food);
-  //   })
-  //   return response;
-  // }
+  addFoodEaten(foodWithoutID: AddFood) {
+
+    return this.http.post(
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten.json`,
+      JSON.stringify(foodWithoutID),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    )
+  }
+
+  getFoodsEaten(): Observable<Food[]> {
+    return this.http.get<Food[]>(
+      'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten.json', 
+    );
+  }
 }

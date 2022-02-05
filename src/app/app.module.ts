@@ -20,6 +20,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { InterceptorService } from './auth/interceptor.service';
+import { FoodDiaryComponent } from './pages/food-diary/food-diary.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { InterceptorService } from './auth/interceptor.service';
     AddFoodComponent,
     ToastComponent,
     LoginComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    FoodDiaryComponent
   ],
   imports: [
     BrowserModule,

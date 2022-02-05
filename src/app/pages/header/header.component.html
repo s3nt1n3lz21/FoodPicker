@@ -5,4 +5,7 @@
     <div class="link" *ngIf="isAuthenticated">
         <p (click)="router.navigate(['add-food'])">Add Food</p>
     </div>
+    <div class="link" *ngIf="isAuthenticated">
+        <p (click)="router.navigate(['food-diary'])">Food Diary</p>
+    </div>
 </div>

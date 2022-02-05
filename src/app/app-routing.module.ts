@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AddFoodComponent } from './pages/add-food/add-food.component';
+import { FoodDiaryComponent } from './pages/food-diary/food-diary.component';
 import { FoodListComponent } from './pages/food-list/food-list.component';
 import { LoginComponent } from './pages/login/login.component';
 import { AuthGuardService } from './services/auth-guard.service';
@@ -22,6 +23,12 @@ const routes: Routes = [
   {
     path: 'add-food',
     component: AddFoodComponent,
+    canActivate: [AuthGuardService]
+  },
+
+  {
+    path: 'food-diary',
+    component: FoodDiaryComponent,
     canActivate: [AuthGuardService]
   },
 ];

@@ -26,6 +26,8 @@ export interface AddFood {
     ignore: boolean;
     available: boolean;
     availableExpiry: string;
+    foodFraction: number;
+    dateEaten: string;
 }
 
 export interface Food extends AddFood {
@@ -59,6 +61,8 @@ export function emptyAddFood(): AddFood {
         ignore: false,
         available: true,
         availableExpiry: new Date().toISOString(),
+        foodFraction: 1,
+        dateEaten: ''
     }
   }
 
@@ -90,6 +94,8 @@ export function emptyAddFood(): AddFood {
         available: true,
         availableExpiry: new Date().toISOString(),
         id: '',
+        foodFraction: 1,
+        dateEaten: ''
     }
   }
 
@@ -120,12 +126,10 @@ export function convertFoodToAddFood(food: Food): AddFood {
     result.ignore = food.ignore;
     result.available = food.available;
     result.availableExpiry = food.availableExpiry;
+    result.foodFraction = food.foodFraction;
+    result.dateEaten = food.dateEaten;
     return result;
 }
-
-// export interface IQuestionFormValues extends Food {
-
-// }
 
 export interface IFoodForm extends FormGroup {
     value: Food;
