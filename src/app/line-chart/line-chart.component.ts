@@ -46,7 +46,7 @@ export class LineChartComponent implements OnChanges {
 
     this.yScale = d3
       .scaleLinear()
-      .domain([d3.max(this.data, d => d.value) + 1, d3.min(this.data, d => d.value) - 1])
+      .domain([d3.max(this.data, d => d.value) + 1, 0])
       .range([0, this.height - 2 * this.margin]);
 
     this.yAxis = this.svgInner
