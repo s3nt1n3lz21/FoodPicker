@@ -96,6 +96,18 @@ export class ApiService {
     )
   }
 
+  removeFoodEaten(food: Food) {
+    return this.http.delete(
+      //?auth=${this.token}
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten/${food.id}.json`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    )
+  }
+
   getFoodsEaten(): Observable<Food[]> {
     return this.http.get<Food[]>(
       'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten.json', 

@@ -21,6 +21,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { InterceptorService } from './auth/interceptor.service';
 import { FoodDiaryComponent } from './pages/food-diary/food-diary.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { FoodDiaryComponent } from './pages/food-diary/food-diary.component';
     ToastComponent,
     LoginComponent,
     LoadingSpinnerComponent,
-    FoodDiaryComponent
+    FoodDiaryComponent,
+    LineChartComponent
   ],
   imports: [
     BrowserModule,

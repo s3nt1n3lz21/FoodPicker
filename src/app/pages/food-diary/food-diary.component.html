@@ -25,6 +25,8 @@
 >
 </ag-grid-angular>
 <button (click)="setFoodAsEaten()">Set Food As Eaten</button>
+<button (click)="setFoodAsNotEaten()">Set Food As Not Eaten</button>
 <input type="search" [(ngModel)]="fractionEaten">
 <h2>Calories Today:</h2>
 <h2>{{ caloriesToday }}</h2>
+<app-line-chart [data]='data'></app-line-chart>
