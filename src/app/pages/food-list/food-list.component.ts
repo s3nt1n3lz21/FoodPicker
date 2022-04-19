@@ -401,7 +401,6 @@ export class FoodListComponent implements OnInit {
 
   public searchFood(searchString: string) {
     this.matchingFoods = this.foods.filter((f) => f.name.includes(searchString));
-    console.log('matchingFoods: ', this.matchingFoods);
     this.agGridMatchingFoods.api.setRowData(this.matchingFoods);
   }
 
@@ -432,6 +431,33 @@ export class FoodListComponent implements OnInit {
       const food: Food = node.data;
       this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
       this.apiService.removeChosenFood(food).subscribe();
+    });
+  }
+
+  public deleteFoods() {
+    const selectedNodesChosenFoods = this.agGridChosenFoods.api.getSelectedNodes();
+    selectedNodesChosenFoods.forEach(node => {
+      const food: Food = node.data;
+      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.apiService.deleteFood(food).subscribe();
+    });
+
+    const selectedNodesMatchingFoods = this.agGridMatchingFoods.api.getSelectedNodes();
+    selectedNodesMatchingFoods.forEach(node => {
+      const food: Food = node.data;
+      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.apiService.deleteFood(food).subscribe(
+        () => {
+          this.searchFood(this.search);
+        }
+      );
+    });
+
+    const selectedNodesSuggestedFoods = this.agGridSuggestedFoods.api.getSelectedNodes();
+    selectedNodesSuggestedFoods.forEach(node => {
+      const food: Food = node.data;
+      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.apiService.deleteFood(food).subscribe();
     });
   }
 

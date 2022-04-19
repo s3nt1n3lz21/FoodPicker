@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridOptions } from 'ag-grid-community';
+import { forkJoin } from 'rxjs';
 import { NameRendererComponent } from 'src/app/ag-grid/renderers/name-renderer/name-renderer.component';
 import { RankingRendererComponent } from 'src/app/ag-grid/renderers/ranking-renderer/ranking-renderer.component';
 import { convertFoodToAddFood, emptyFood, Food } from 'src/app/model/IFood';
@@ -19,6 +20,167 @@ export class FoodDiaryComponent implements OnInit {
   constructor(private apiService: ApiService) { }
 
   ngOnInit(): void {
+    this.refreshEatenFoods();
+    this.refreshChosenFoods();
+  }
+
+  public caloriesToday;
+  public proteinToday;
+  public averageCaloriesLastWeek;
+  public averageProteinLastWeek;
+  allFoodsEaten: Food[] = [];
+  foodsEatenToday: Food[] = [];
+  chosenFoods: Food[] = [];
+  fractionEaten;
+
+  frameworkComponents = {
+    nameRenderer: NameRendererComponent,
+    timesEatenRenderer: RankingRendererComponent
+  };
+
+  @ViewChild('agGridEatenFoods') agGridEatenFoods!: AgGridAngular;
+  @ViewChild('agGridChosenFoods') agGridChosenFoods!: AgGridAngular;
+  
+  defaultColDef: ColDef = {
+    flex: 1,
+    sortable: true,
+    filter: true,
+    resizable: true
+  };
+
+  columnDefs: ColDef[] = [
+    { field: 'name', editable: true, minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer" },
+    { field: 'proteinPer100Calorie', editable: true },
+    { field: 'foodFraction', editable: true },
+    { field: 'totalCalories', editable: true },
+    { field: 'totalProtein', editable: true },
+    { field: 'poundsPer1000Calories', editable: true },
+    { field: 'rankWeighting', editable: true },
+    { field: 'price', editable: true },
+    { field: 'timesEaten', editable: true, cellRenderer: "timesEatenRenderer" },
+    { field: 'ignore', editable: true },
+    { field: 'available', editable: true },
+  ];
+
+  gridOptions: GridOptions = {
+    rowClassRules: {
+      'rated-before': params => params.api.getValue('rankWeighting', params.node) != 0,
+    },
+  }
+
+  setFoodAsEaten() {
+    const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
+    const selectedFoods: Food[] = selectedNodes.map(node => {
+      return node.data;
+    });
+
+    selectedFoods.forEach(food => {
+      const index = this.chosenFoods.findIndex(f => food.id === f.id);
+      const foodEaten = food;
+      foodEaten.foodFraction = this.fractionEaten;
+      foodEaten.dateEaten = new Date().toISOString();
+      foodEaten.timesEaten += 1;
+      this.foodsEatenToday.push(foodEaten);
+
+      forkJoin(
+        [
+          this.apiService.addFoodEaten(convertFoodToAddFood(food)),
+          this.apiService.updateFood(foodEaten),
+          this.apiService.updateChosenFood(foodEaten)
+        ]
+      ).subscribe(() => {
+        this.agGridEatenFoods.api.setRowData(this.foodsEatenToday);
+
+        this.caloriesToday = 0;
+        this.proteinToday = 0;
+        this.foodsEatenToday.forEach(food => {
+          this.caloriesToday += food.totalCalories*food.foodFraction;
+          this.proteinToday += food.totalProtein*food.foodFraction;
+        });
+    
+        this.refreshChosenFoods();
+        this.refreshEatenFoods();
+      });
+    });
+  }
+
+  setFoodAsNotEaten() {
+    const selectedNodes = this.agGridEatenFoods.api.getSelectedNodes();
+    const selectedFoods: Food[] = selectedNodes.map(node => {
+      return node.data;
+    });
+
+    selectedFoods.forEach(food => {
+      // this.apiService.removeFoodEaten(food).subscribe();
+      const foodEaten = food;
+      foodEaten.timesEaten -= 1;
+      // this.apiService.updateFood(foodEaten)
+
+      forkJoin(
+        [
+          this.apiService.removeFoodEaten(food),
+          this.apiService.updateFood(foodEaten),
+          this.apiService.updateChosenFood(foodEaten)
+        ]
+      ).subscribe(() => {
+        this.refreshChosenFoods();
+        this.refreshEatenFoods();
+      });
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /////////////////////////
+
+  refreshChosenFoods() {
+    this.apiService.getChosenFoods().subscribe(
+      (data) => {
+        const foods = [];
+        for (const key in data) {
+          const food: Food = {
+            ...emptyFood(),
+            id: key,
+            ...data[key]
+          };
+
+          if (new Date(food.availableExpiry) < new Date()) {
+            food.available = true;
+          }
+
+          foods.push(food);
+        }
+  
+        this.chosenFoods = foods;
+        this.agGridChosenFoods.api.sizeColumnsToFit();
+
+      },
+      (error) => {
+        console.error(error);
+      }
+    )
+  }
+
+  refreshEatenFoods() {
     this.apiService.getFoodsEaten().subscribe(
       (data) => {
         const foods: Food[] = [];
@@ -97,9 +259,6 @@ export class FoodDiaryComponent implements OnInit {
         this.data = caloriesPerDay;
         this.proteinData = proteinPerDay;
 
-        console.log('')
-        console.log('proteinPerDay: ', proteinPerDay);
-
         this.caloriesToday = 0;
         this.proteinToday = 0;
         this.foodsEatenToday.forEach(food => {
@@ -120,125 +279,10 @@ export class FoodDiaryComponent implements OnInit {
         this.averageProteinLastWeek /= 7;
 
         this.agGridEatenFoods.api.sizeColumnsToFit();
-
-      },
-      (error) => {
-        console.error(error);
-      }
-    )
-
-    this.apiService.getChosenFoods().subscribe(
-      (data) => {
-        const foods = [];
-        for (const key in data) {
-          const food: Food = {
-            ...emptyFood(),
-            id: key,
-            ...data[key]
-          };
-
-          if (new Date(food.availableExpiry) < new Date()) {
-            food.available = true;
-          }
-
-          foods.push(food);
-        }
-  
-        this.chosenFoods = foods;
-
-        this.agGridEatenFoods.api.sizeColumnsToFit();
-        this.agGridChosenFoods.api.sizeColumnsToFit();
-
       },
       (error) => {
         console.error(error);
       }
     )
   }
-
-  public totalCaloriesBetweenDates(start: Date, end: Date) {
-
-  }
-
-  public caloriesToday;
-  public proteinToday;
-  public averageCaloriesLastWeek;
-  public averageProteinLastWeek;
-  allFoodsEaten: Food[] = [];
-  foodsEatenToday: Food[] = [];
-  chosenFoods: Food[] = [];
-  fractionEaten;
-
-  frameworkComponents = {
-    nameRenderer: NameRendererComponent,
-    timesEatenRenderer: RankingRendererComponent
-  };
-
-  @ViewChild('agGridEatenFoods') agGridEatenFoods!: AgGridAngular;
-  @ViewChild('agGridChosenFoods') agGridChosenFoods!: AgGridAngular;
-  
-  defaultColDef: ColDef = {
-    flex: 1,
-    sortable: true,
-    filter: true,
-    resizable: true
-  };
-
-  columnDefs: ColDef[] = [
-    { field: 'name', editable: true, minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer" },
-    { field: 'proteinPer100Calorie', editable: true },
-    { field: 'foodFraction', editable: true },
-    { field: 'totalCalories', editable: true },
-    { field: 'totalProtein', editable: true },
-    { field: 'poundsPer1000Calories', editable: true },
-    { field: 'rankWeighting', editable: true },
-    { field: 'price', editable: true },
-    { field: 'timesEaten', editable: true, cellRenderer: "timesEatenRenderer" },
-    { field: 'ignore', editable: true },
-    { field: 'available', editable: true },
-  ];
-
-  gridOptions: GridOptions = {
-    rowClassRules: {
-      'rated-before': params => params.api.getValue('rankWeighting', params.node) != 0,
-    },
-  }
-
-  setFoodAsEaten() {
-    const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
-    const selectedFoods: Food[] = selectedNodes.map(node => {
-      return node.data;
-    });
-
-    selectedFoods.forEach(food => {
-      const index = this.chosenFoods.findIndex(f => food.id === f.id);
-      const foodEaten = food;
-      foodEaten.foodFraction = this.fractionEaten;
-      foodEaten.dateEaten = new Date().toISOString();
-      this.foodsEatenToday.push(foodEaten);
-      this.apiService.addFoodEaten(convertFoodToAddFood(food)).subscribe();
-    });
-
-    this.agGridEatenFoods.api.setRowData(this.foodsEatenToday);
-
-    this.caloriesToday = 0;
-    this.proteinToday = 0;
-    this.foodsEatenToday.forEach(food => {
-      this.caloriesToday += food.totalCalories*food.foodFraction;
-      this.proteinToday += food.totalProtein*food.foodFraction;
-    })
-  }
-
-  setFoodAsNotEaten() {
-    const selectedNodes = this.agGridEatenFoods.api.getSelectedNodes();
-    const selectedFoods: Food[] = selectedNodes.map(node => {
-      return node.data;
-    });
-
-    selectedFoods.forEach(food => {
-      this.apiService.removeFoodEaten(food).subscribe();
-    });
-  }
-
-  // Only show todays eaten foods
 }
