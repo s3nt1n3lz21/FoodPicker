@@ -28,5 +28,12 @@
 <button (click)="setFoodAsNotEaten()">Set Food As Not Eaten</button>
 <input type="search" [(ngModel)]="fractionEaten">
 <h2>Calories Today:</h2>
-<h2>{{ caloriesToday }}</h2>
+<h2>{{ caloriesToday | number : '1.2-2'}}</h2>
+<h2>Average Calories Last Week:</h2>
+<h2>{{ averageCaloriesLastWeek | number : '1.2-2'}}</h2>
+<h2>Protein Today:</h2>
+<h2>{{ proteinToday | number : '1.2-2'}}</h2>
+<h2>Average Protein Last Week:</h2>
+<h2>{{ averageProteinLastWeek | number : '1.2-2'}}</h2>
 <app-line-chart [data]='data'></app-line-chart>
+<app-line-chart [data]='proteinData'></app-line-chart>

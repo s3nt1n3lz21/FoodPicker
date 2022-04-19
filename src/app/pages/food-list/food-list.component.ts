@@ -209,7 +209,7 @@ export class FoodListComponent implements OnInit {
     const maxLoops = 1000;
     let numLoops = 0;
     // let maxProtein = 2.2 * 58; 127.6
-    let maxProtein = 100;
+    let maxProtein = 60;
     this.averageReqProteinPerCalorie = (maxProtein/this.caloriesPerDay)*100;
     while ((this.totalProteinPerDay < maxProtein || this.daysFood < 7) && numLoops < maxLoops) {
       // get lowest protein food and replace with random food
@@ -239,15 +239,17 @@ export class FoodListComponent implements OnInit {
     let ignoreFood = food.ignore;
     let poundsPer1000Calorie = food.poundsPer1000Calories;
     let rank = food.rankWeighting*1;
+    let proteinPer100Calorie = food.proteinPer100Calorie;
 
     // get another food if food not available, or ignoring food, or costs too much
     // ~ 1400 calories a day ~ 10000 calories every 7 days. £70 per 10000 calories
     let limit = 0;
-    while ((!foodAvailable || ignoreFood || poundsPer1000Calorie > 6.3 || rank == -1 || rank == 1) && limit < 20000) {
+    while ((!foodAvailable || ignoreFood || poundsPer1000Calorie > 6.3 || proteinPer100Calorie < 5 || rank == -1 || rank == 1) && limit < 20000) {
       food = this.getRandomFood();
       foodAvailable = food.available;
       ignoreFood = food.ignore;
       poundsPer1000Calorie = food.poundsPer1000Calories;
+      proteinPer100Calorie = food.proteinPer100Calorie;
       rank = food.rankWeighting*1;
       limit += 1;
     }

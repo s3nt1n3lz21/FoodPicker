@@ -14,6 +14,7 @@ import { ApiService } from 'src/app/services/api.service';
 export class FoodDiaryComponent implements OnInit {
 
   data;
+  proteinData;
 
   constructor(private apiService: ApiService) { }
 
@@ -48,23 +49,35 @@ export class FoodDiaryComponent implements OnInit {
         console.log('sorted foods eaten: ', this.allFoodsEaten);
 
         // Find the total calories for each day
-        let startDate: Date = new Date((Math.floor( new Date(this.allFoodsEaten[0].dateEaten).getTime() / DAY )) * DAY);
+        let startDate: Date = new Date((Math.floor( new Date(this.allFoodsEaten[0].dateEaten).getTime() / DAY )) * DAY + DAY/6);
         console.log('startDate: ', startDate);
         let endDate: Date = new Date(startDate.getTime() + DAY);
         console.log('endDate: ', endDate);
+
+
         let caloriesCurrentDay = 0;
         const caloriesPerDay = [];
+        let proteinCurrentDay = 0;
+        const proteinPerDay = [];
 
         this.allFoodsEaten.forEach(food => {
           if (new Date(food.dateEaten) > startDate && new Date(food.dateEaten) < endDate) {
             caloriesCurrentDay += food.totalCalories * food.foodFraction;
+            proteinCurrentDay += food.totalProtein * food.foodFraction;
           } else {
+
             caloriesPerDay.push({
               value: caloriesCurrentDay,
               date: startDate.toISOString()
             });
 
+            proteinPerDay.push({
+              value: proteinCurrentDay,
+              date: startDate.toISOString()
+            });
+
             caloriesCurrentDay = food.totalCalories * food.foodFraction;
+            proteinCurrentDay = food.totalProtein * food.foodFraction;
 
             startDate = new Date(startDate.getTime() + DAY);
             endDate = new Date(endDate.getTime() + DAY);
@@ -76,12 +89,35 @@ export class FoodDiaryComponent implements OnInit {
           date: startDate.toISOString()
         });
 
+        proteinPerDay.push({
+          value: proteinCurrentDay,
+          date: startDate.toISOString()
+        });
+
         this.data = caloriesPerDay;
+        this.proteinData = proteinPerDay;
+
+        console.log('')
+        console.log('proteinPerDay: ', proteinPerDay);
 
         this.caloriesToday = 0;
+        this.proteinToday = 0;
         this.foodsEatenToday.forEach(food => {
           this.caloriesToday += food.totalCalories*food.foodFraction;
+          this.proteinToday += food.totalProtein*food.foodFraction;
         })
+
+        this.averageCaloriesLastWeek = 0;
+        caloriesPerDay.slice(-7).forEach((calories) => {
+          this.averageCaloriesLastWeek += calories.value;
+        })
+        this.averageCaloriesLastWeek /= 7;
+
+        this.averageProteinLastWeek = 0;
+        proteinPerDay.slice(-7).forEach((protein) => {
+          this.averageProteinLastWeek += protein.value;
+        })
+        this.averageProteinLastWeek /= 7;
 
         this.agGridEatenFoods.api.sizeColumnsToFit();
 
@@ -125,6 +161,9 @@ export class FoodDiaryComponent implements OnInit {
   }
 
   public caloriesToday;
+  public proteinToday;
+  public averageCaloriesLastWeek;
+  public averageProteinLastWeek;
   allFoodsEaten: Food[] = [];
   foodsEatenToday: Food[] = [];
   chosenFoods: Food[] = [];
@@ -183,8 +222,10 @@ export class FoodDiaryComponent implements OnInit {
     this.agGridEatenFoods.api.setRowData(this.foodsEatenToday);
 
     this.caloriesToday = 0;
+    this.proteinToday = 0;
     this.foodsEatenToday.forEach(food => {
       this.caloriesToday += food.totalCalories*food.foodFraction;
+      this.proteinToday += food.totalProtein*food.foodFraction;
     })
   }
 

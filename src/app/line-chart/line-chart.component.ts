@@ -20,6 +20,9 @@ export class LineChartComponent implements OnChanges {
   public xAxis;
   public yAxis;
   public lineGroup;
+  public lineGroup2;
+  public lineGroup3;
+  public lineGroup4;
 
   constructor(public chartElem: ElementRef) {
   }
@@ -66,8 +69,32 @@ export class LineChartComponent implements OnChanges {
       .append('path')
       .attr('id', 'line')
       .style('fill', 'none')
-      .style('stroke', 'red')
+      .style('stroke', 'blue')
       .style('stroke-width', '2px')
+
+    this.lineGroup2 = this.svgInner
+      .append('g')
+      .append('path')
+      .attr('id', 'line')
+      .style('fill', 'none')
+      .style('stroke', 'red')
+      .style('stroke-width', '4px')
+
+      this.lineGroup3 = this.svgInner
+      .append('g')
+      .append('path')
+      .attr('id', 'line')
+      .style('fill', 'none')
+      .style('stroke', 'purple')
+      .style('stroke-width', '4px')
+
+      this.lineGroup4 = this.svgInner
+      .append('g')
+      .append('path')
+      .attr('id', 'line')
+      .style('fill', 'none')
+      .style('stroke', 'orange')
+      .style('stroke-width', '4px')
   }
 
   private drawChart(): void {
@@ -99,6 +126,45 @@ export class LineChartComponent implements OnChanges {
       this.yScale(d.value),
     ]);
 
+    const limitLine: [number, number][] = this.data.map(d => [
+      this.xScale(new Date(d.date)),
+      this.yScale(1300),
+    ]);
+
+    // Calculate all time average
+    let sum = 0;
+    let weeks = Math.floor(this.data.length / 7);
+    console.log('weeks total: ', weeks);
+    this.data.forEach((d, i) => {
+      if (i < weeks*7) {
+        sum += d.value;
+      }
+    })
+    const average = sum/(weeks*7);
+
+    // Calculate average of last week
+    let sumLastWeek = 0;
+    if (this.data.length - 8 >= 0) {
+      let dataLastWeek = this.data.slice(this.data.length - 8, this.data.length - 1);
+      dataLastWeek.forEach((d, i) => {
+        sumLastWeek += d.value;
+      });
+    }
+    const averageLastWeek = sumLastWeek/7;
+
+    const averageLine: [number, number][] = this.data.map(d => [
+      this.xScale(new Date(d.date)),
+      this.yScale(average),
+    ]);
+
+    const averageLineLastWeek: [number, number][] = this.data.map(d => [
+      this.xScale(new Date(d.date)),
+      this.yScale(averageLastWeek),
+    ]);
+
     this.lineGroup.attr('d', line(points));
+    this.lineGroup2.attr('d', line(limitLine));
+    this.lineGroup3.attr('d', line(averageLine));
+    this.lineGroup4.attr('d', line(averageLineLastWeek));
   }
 }
