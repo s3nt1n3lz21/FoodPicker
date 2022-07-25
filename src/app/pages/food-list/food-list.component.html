@@ -11,6 +11,7 @@
   groupSelectsChildren 
 >
 </ag-grid-angular>
+<button (click)="addSearchedFoods()">Add Searched Foods</button>
 <h2>Chosen Foods</h2>
 <ag-grid-angular
   #agGridChosenFoods
@@ -49,7 +50,6 @@
   <button (click)="chooseFoods()">Add To Chosen Foods</button>
   <button (click)="replaceSuggestedFoods()">Replace Suggested Foods</button>
   <button (click)="removeFoods()">Remove Suggested Foods</button>
-  <button (click)="addSearchedFoods()">Add Searched Foods</button>
   <button (click)="deleteFoods()">Delete Selected Foods</button>
   <input type="search" [(ngModel)]="search"><button (click)="searchFood(search)">Search</button>
 

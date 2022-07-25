@@ -1,6 +1,7 @@
 import { FormGroup } from "@angular/forms"
 
 export interface AddFood {
+    foodId: string; // Id is the database id in the foods list
     name: string;
     url: string;
     extractedPrice: string;
@@ -30,12 +31,14 @@ export interface AddFood {
     dateEaten: string;
 }
 
+// Food has been added to a database and has a databaseID
 export interface Food extends AddFood {
-    id: string;
+    databaseID: string;
 }
 
 export function emptyAddFood(): AddFood {
     return {
+        foodId: '',
         name: '',
         url: '',
         extractedPrice: '',
@@ -68,6 +71,7 @@ export function emptyAddFood(): AddFood {
 
   export function emptyFood(): Food {
     return {
+        foodId: '',
         name: '',
         url: '',
         extractedPrice: '',
@@ -93,7 +97,7 @@ export function emptyAddFood(): AddFood {
         ignore: false,
         available: true,
         availableExpiry: new Date().toISOString(),
-        id: '',
+        databaseID: '',
         foodFraction: 1,
         dateEaten: ''
     }
@@ -101,6 +105,7 @@ export function emptyAddFood(): AddFood {
 
 export function convertFoodToAddFood(food: Food): AddFood {
     const result: AddFood = emptyAddFood();
+    result.foodId = food.foodId;
     result.name = food.name;
     result.url = food.url;
     result.extractedPrice = food.extractedPrice;

@@ -42,64 +42,8 @@ export class FoodListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.apiService.getFoods().subscribe(
-      (data) => {
-        const foods = [];
-        for (const key in data) {
-          const food: Food = {
-            ...emptyFood(),
-            id: key,
-            ...data[key]
-          };
-
-          if (new Date(food.availableExpiry) < new Date()) {
-            food.available = true;
-          }
-
-          foods.push(food);
-        }
-  
-        this.foods = foods;
-        console.log(this.foods);
-
-        this.agGridSuggestedFoods.api.sizeColumnsToFit();
-        this.agGridMatchingFoods.api.sizeColumnsToFit();
-        this.agGridChosenFoods.api.sizeColumnsToFit();
-
-      },
-      (error) => {
-        console.error(error);
-      }
-    )
-
-    this.apiService.getChosenFoods().subscribe(
-      (data) => {
-        const foods = [];
-        for (const key in data) {
-          const food: Food = {
-            ...emptyFood(),
-            id: key,
-            ...data[key]
-          };
-
-          if (new Date(food.availableExpiry) < new Date()) {
-            food.available = true;
-          }
-
-          foods.push(food);
-        }
-  
-        this.chosenFoods = foods;
-
-        this.agGridSuggestedFoods.api.sizeColumnsToFit();
-        this.agGridMatchingFoods.api.sizeColumnsToFit();
-        this.agGridChosenFoods.api.sizeColumnsToFit();
-
-      },
-      (error) => {
-        console.error(error);
-      }
-    )
+    this.refreshFoodsList();
+    this.refreshChosenFoods();
   }
 
   public loadCSV(files: FileList) {
@@ -244,7 +188,7 @@ export class FoodListComponent implements OnInit {
     // get another food if food not available, or ignoring food, or costs too much
     // ~ 1400 calories a day ~ 10000 calories every 7 days. £70 per 10000 calories
     let limit = 0;
-    while ((!foodAvailable || ignoreFood || poundsPer1000Calorie > 6.3 || proteinPer100Calorie < 5 || rank == -1 || rank == 1) && limit < 20000) {
+    while ((!foodAvailable || ignoreFood || poundsPer1000Calorie > 6.3 || proteinPer100Calorie < 4.8 || rank == -1 || rank == 1) && limit < 20000) {
       food = this.getRandomFood();
       foodAvailable = food.available;
       ignoreFood = food.ignore;
@@ -323,7 +267,7 @@ export class FoodListComponent implements OnInit {
     });
 
     selectedFoods.forEach(food => {
-      const index = this.suggestedFoods.findIndex(f => food.id === f.id);
+      const index = this.suggestedFoods.findIndex(f => food.databaseID === f.databaseID);
       this.suggestedFoods.splice(index, 1);
       this.chosenFoods.push(food);
       this.apiService.addChosenFood(convertFoodToAddFood(food)).subscribe();
@@ -338,7 +282,7 @@ export class FoodListComponent implements OnInit {
     const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
     selectedNodes.forEach(node => {
       const food: Food = node.data;
-      const index = this.suggestedFoods.findIndex((f) => f.id === food.id)
+      const index = this.suggestedFoods.findIndex((f) => f.databaseID === food.databaseID)
       if (index) {
         this.suggestedFoods.splice(index, 1);
         this.suggestedFoods.push(this.getRandomValidFood());
@@ -356,7 +300,7 @@ export class FoodListComponent implements OnInit {
     const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes();
     selectedNodes.forEach(node => {
       const food: Food = node.data;
-      const index = this.suggestedFoods.findIndex((f) => f.id === food.id)
+      const index = this.suggestedFoods.findIndex((f) => f.databaseID === food.databaseID)
       if (index) {
         this.suggestedFoods.splice(index, 1);
       }
@@ -373,19 +317,19 @@ export class FoodListComponent implements OnInit {
     const selectedNodes = this.agGridSuggestedFoods.api.getSelectedNodes()
     selectedNodes.forEach(node => {
       const data: Food = node.data;
-      const index = this.suggestedFoods.findIndex((f) => f.id === data.id)
+      const index = this.suggestedFoods.findIndex((f) => f.databaseID === data.databaseID)
       if (index) {
         this.suggestedFoods[index].available = false;
         this.suggestedFoods.splice(index, 1);
       }
 
-      const index2 = this.chosenFoods.findIndex((f) => f.id === data.id)
+      const index2 = this.chosenFoods.findIndex((f) => f.databaseID === data.databaseID)
       if (index2) {
         this.chosenFoods[index2].available = false;
         this.chosenFoods.splice(index2, 1);
       }
 
-      const index3 = this.matchingFoods.findIndex((f) => f.id === data.id)
+      const index3 = this.matchingFoods.findIndex((f) => f.databaseID === data.databaseID)
       if (index3) {
         this.matchingFoods[index3].available = false;
         this.matchingFoods.splice(index3, 1);
@@ -429,7 +373,7 @@ export class FoodListComponent implements OnInit {
     const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
     selectedNodes.forEach(node => {
       const food: Food = node.data;
-      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.chosenFoods = this.chosenFoods.filter(f => f.databaseID != food.databaseID);
       this.apiService.removeChosenFood(food).subscribe();
     });
   }
@@ -438,14 +382,14 @@ export class FoodListComponent implements OnInit {
     const selectedNodesChosenFoods = this.agGridChosenFoods.api.getSelectedNodes();
     selectedNodesChosenFoods.forEach(node => {
       const food: Food = node.data;
-      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.chosenFoods = this.chosenFoods.filter(f => f.databaseID != food.databaseID);
       this.apiService.deleteFood(food).subscribe();
     });
 
     const selectedNodesMatchingFoods = this.agGridMatchingFoods.api.getSelectedNodes();
     selectedNodesMatchingFoods.forEach(node => {
       const food: Food = node.data;
-      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.chosenFoods = this.chosenFoods.filter(f => f.databaseID != food.databaseID);
       this.apiService.deleteFood(food).subscribe(
         () => {
           this.searchFood(this.search);
@@ -456,9 +400,65 @@ export class FoodListComponent implements OnInit {
     const selectedNodesSuggestedFoods = this.agGridSuggestedFoods.api.getSelectedNodes();
     selectedNodesSuggestedFoods.forEach(node => {
       const food: Food = node.data;
-      this.chosenFoods = this.chosenFoods.filter(f => f.id != food.id);
+      this.chosenFoods = this.chosenFoods.filter(f => f.databaseID != food.databaseID);
       this.apiService.deleteFood(food).subscribe();
     });
+  }
+
+  public refreshFoodsList() {
+    this.apiService.getFoods().subscribe(
+      (data) => {
+        const foods = [];
+        for (const key in data) {
+          const food: Food = {
+            ...emptyFood(),
+            databaseID: key,
+            ...data[key]
+          };
+
+          if (new Date(food.availableExpiry) < new Date()) {
+            food.available = true;
+          }
+
+          foods.push(food);
+        }
+  
+        this.foods = foods;
+        this.searchFood(this.search);
+      },
+      (error) => {
+        console.error(error);
+      }
+    )
+  }
+
+  public refreshChosenFoods() {
+    this.apiService.getChosenFoods().subscribe(
+      (data) => {
+        const foods = [];
+        for (const key in data) {
+          const food: Food = {
+            ...emptyFood(),
+            databaseID: key,
+            ...data[key]
+          };
+
+          if (new Date(food.availableExpiry) < new Date()) {
+            food.available = true;
+          }
+
+          foods.push(food);
+        }
+  
+        this.chosenFoods = foods;
+
+        this.agGridChosenFoods.api.sizeColumnsToFit();
+
+      },
+      (error) => {
+        console.error(error);
+      }
+    )
   }
 
   rowData: Observable<any[]>;

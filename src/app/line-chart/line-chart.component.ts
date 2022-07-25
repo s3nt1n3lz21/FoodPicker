@@ -1,13 +1,18 @@
 import { Component, ElementRef, Input, OnChanges } from '@angular/core';
 import * as d3 from 'd3';
 
+interface dataPoint {
+  value: number,
+  date: string
+}
+
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html',
   styleUrls: ['./line-chart.component.scss']
 })
 export class LineChartComponent implements OnChanges {
-  @Input() public data: { value: number, date: string }[];
+  @Input() public data: dataPoint[];
 
   private width = 700;
   private height = 700;
@@ -23,6 +28,7 @@ export class LineChartComponent implements OnChanges {
   public lineGroup2;
   public lineGroup3;
   public lineGroup4;
+  public lineGroup5;
 
   constructor(public chartElem: ElementRef) {
   }
@@ -95,12 +101,20 @@ export class LineChartComponent implements OnChanges {
       .style('fill', 'none')
       .style('stroke', 'orange')
       .style('stroke-width', '4px')
+
+      this.lineGroup5 = this.svgInner
+      .append('g')
+      .append('path')
+      .attr('id', 'line')
+      .style('fill', 'none')
+      .style('stroke', 'green')
+      .style('stroke-width', '4px')
   }
 
   private drawChart(): void {
     this.width = this.chartElem.nativeElement.getBoundingClientRect().width;
     this.svg.attr('width', this.width);
-
+    
     this.xScale.range([this.margin, this.width - 2 * this.margin]);
 
     const xAxis = d3
@@ -152,7 +166,7 @@ export class LineChartComponent implements OnChanges {
     }
     const averageLastWeek = sumLastWeek/7;
 
-    const averageLine: [number, number][] = this.data.map(d => [
+    const averageAllTimeLine: [number, number][] = this.data.map(d => [
       this.xScale(new Date(d.date)),
       this.yScale(average),
     ]);
@@ -162,9 +176,27 @@ export class LineChartComponent implements OnChanges {
       this.yScale(averageLastWeek),
     ]);
 
+    const weeklyAverageLine: [number, number][] = this.data.map((d, index) => [
+      this.xScale(new Date(d.date)),
+      this.yScale(this._calc7PointAverage(index, this.data)),
+    ]);
+
     this.lineGroup.attr('d', line(points));
     this.lineGroup2.attr('d', line(limitLine));
-    this.lineGroup3.attr('d', line(averageLine));
+    this.lineGroup3.attr('d', line(averageAllTimeLine));
     this.lineGroup4.attr('d', line(averageLineLastWeek));
+    this.lineGroup5.attr('d', line(weeklyAverageLine))
+  }
+
+  private _calc7PointAverage(day: number, data: dataPoint[]): number {
+    let sum: number = 0;
+    let start: number = Math.max(0, day - 3);
+    let end: number = Math.min(data.length - 1, day + 3);
+
+    data.slice(start, end).forEach(d => {
+      sum += d.value;
+    });
+
+    return sum/(end - start)
   }
 }

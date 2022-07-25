@@ -22,7 +22,7 @@ export class ApiService {
     const foodWithoutID: AddFood = convertFoodToAddFood(food);
     return this.http.put(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${food.databaseID}.json`,
       JSON.stringify(foodWithoutID),
       {
         headers: {
@@ -47,7 +47,7 @@ export class ApiService {
   deleteFood(food: Food) {
     return this.http.delete(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${food.databaseID}.json`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export class ApiService {
   removeChosenFood(food: Food) {
     return this.http.delete(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${food.databaseID}.json`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export class ApiService {
     const foodWithoutID: AddFood = convertFoodToAddFood(food);
     return this.http.put(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${food.databaseID}.json`,
       JSON.stringify(foodWithoutID),
       {
         headers: {
@@ -125,7 +125,7 @@ export class ApiService {
   removeFoodEaten(food: Food) {
     return this.http.delete(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten/${food.databaseID}.json`,
       {
         headers: {
           'Content-Type': 'application/json',

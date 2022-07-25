@@ -75,7 +75,6 @@ export class FoodDiaryComponent implements OnInit {
     });
 
     selectedFoods.forEach(food => {
-      const index = this.chosenFoods.findIndex(f => food.id === f.id);
       const foodEaten = food;
       foodEaten.foodFraction = this.fractionEaten;
       foodEaten.dateEaten = new Date().toISOString();
@@ -159,7 +158,7 @@ export class FoodDiaryComponent implements OnInit {
         for (const key in data) {
           const food: Food = {
             ...emptyFood(),
-            id: key,
+            databaseID: key,
             ...data[key]
           };
 
@@ -187,7 +186,7 @@ export class FoodDiaryComponent implements OnInit {
         for (const key in data) {
           const food: Food = {
             ...emptyFood(),
-            id: key,
+            databaseID: key,
             ...data[key]
           };
 
