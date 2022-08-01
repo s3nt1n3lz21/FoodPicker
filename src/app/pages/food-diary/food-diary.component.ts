@@ -4,8 +4,11 @@ import { ColDef, GridOptions } from 'ag-grid-community';
 import { forkJoin } from 'rxjs';
 import { NameRendererComponent } from 'src/app/ag-grid/renderers/name-renderer/name-renderer.component';
 import { RankingRendererComponent } from 'src/app/ag-grid/renderers/ranking-renderer/ranking-renderer.component';
-import { convertFoodToAddFood, emptyFood, Food } from 'src/app/model/IFood';
+import { IChosenFood } from 'src/app/model/IChosenFood';
+import { emptyIEatenFood, IEatenFood, INewEatenFood } from 'src/app/model/IEatenFood';
+import { convertFoodToNewFood, emptyIFood, IFood } from 'src/app/model/IFood';
 import { ApiService } from 'src/app/services/api.service';
+import { FoodsService } from 'src/app/services/foods.service';
 
 @Component({
   selector: 'app-food-diary',
@@ -17,9 +20,29 @@ export class FoodDiaryComponent implements OnInit {
   data;
   proteinData;
 
-  constructor(private apiService: ApiService) { }
+  foods: IFood[];
+  chosenFoods: IChosenFood[];
+  allFoodsEaten: IEatenFood[] = [];
+  foodsEatenToday: IEatenFood[] = [];
+
+  constructor(private foodsService: FoodsService) { }
 
   ngOnInit(): void {
+    // Get latest foods
+    this.foodsService.getFoods().subscribe(foods => {
+      this.foods = foods;
+    })
+
+    // Get latest chosen foods
+    this.foodsService.getChosenFoods().subscribe(chosenFoods => {
+      this.chosenFoods = chosenFoods;
+    })
+
+    // Get latest eaten foods
+    this.foodsService.getEatenFoods().subscribe(eatenFoods => {
+      this.allFoodsEaten = eatenFoods;
+    })
+
     this.refreshEatenFoods();
     this.refreshChosenFoods();
   }
@@ -28,9 +51,7 @@ export class FoodDiaryComponent implements OnInit {
   public proteinToday;
   public averageCaloriesLastWeek;
   public averageProteinLastWeek;
-  allFoodsEaten: Food[] = [];
-  foodsEatenToday: Food[] = [];
-  chosenFoods: Food[] = [];
+
   fractionEaten;
 
   frameworkComponents = {
@@ -52,49 +73,56 @@ export class FoodDiaryComponent implements OnInit {
     { field: 'name', editable: true, minWidth: 300, checkboxSelection: true, cellRenderer: "nameRenderer" },
     { field: 'proteinPer100Calorie', editable: true },
     { field: 'foodFraction', editable: true },
-    { field: 'totalCalories', editable: true },
-    { field: 'totalProtein', editable: true },
-    { field: 'poundsPer1000Calories', editable: true },
-    { field: 'rankWeighting', editable: true },
+    { field: 'nutritionalInformation.totalCalories', editable: true },
+    { field: 'nutritionalInformation.totalProtein', editable: true },
+    { field: 'ratios.poundsPer1000Calories', editable: true },
+    { field: 'rank', editable: true },
     { field: 'price', editable: true },
     { field: 'timesEaten', editable: true, cellRenderer: "timesEatenRenderer" },
     { field: 'ignore', editable: true },
-    { field: 'available', editable: true },
+    { field: 'availableToBuy', editable: true },
   ];
 
   gridOptions: GridOptions = {
     rowClassRules: {
-      'rated-before': params => params.api.getValue('rankWeighting', params.node) != 0,
+      'rated-before': params => params.api.getValue('rank', params.node) != 0,
     },
   }
 
   setFoodAsEaten() {
+    // Get selected chosen foods
     const selectedNodes = this.agGridChosenFoods.api.getSelectedNodes();
-    const selectedFoods: Food[] = selectedNodes.map(node => {
+    const selectedFoods: IChosenFood[] = selectedNodes.map(node => {
       return node.data;
     });
 
-    selectedFoods.forEach(food => {
-      const foodEaten = food;
+    selectedFoods.forEach(selectedChosenFood => {
+      const foodEaten: INewEatenFood = emptyIEatenFood();
+      foodEaten.food = selectedChosenFood.food
       foodEaten.foodFraction = this.fractionEaten;
-      foodEaten.dateEaten = new Date().toISOString();
-      foodEaten.timesEaten += 1;
-      this.foodsEatenToday.push(foodEaten);
+
+      // const chosenFood = selectedChosenFood;
+      // chosenFood.foodFraction = this.fractionEaten;
+      // foodEaten.dateEaten = new Date().toISOString();
+      // foodEaten.timesEaten += 1;
+      // this.foodsEatenToday.push(foodEaten);
+
+      // this.foods
 
       forkJoin(
         [
-          this.apiService.addFoodEaten(convertFoodToAddFood(food)),
-          this.apiService.updateFood(foodEaten),
-          this.apiService.updateChosenFood(foodEaten)
+          this.apiService.addFoodEaten(foodEaten),
+          // this.apiService.updateFood(foodEaten),
+          // this.apiService.updateChosenFood(foodEaten)
         ]
       ).subscribe(() => {
         this.agGridEatenFoods.api.setRowData(this.foodsEatenToday);
 
         this.caloriesToday = 0;
         this.proteinToday = 0;
-        this.foodsEatenToday.forEach(food => {
-          this.caloriesToday += food.totalCalories*food.foodFraction;
-          this.proteinToday += food.totalProtein*food.foodFraction;
+        this.foodsEatenToday.forEach(foodEatenToday => {
+          this.caloriesToday += foodEatenToday.food.nutritionalInformation.totalCalories*foodEatenToday.foodFraction;
+          this.proteinToday += foodEatenToday.food.nutritionalInformation.totalProtein*foodEatenToday.foodFraction;
         });
     
         this.refreshChosenFoods();
@@ -105,15 +133,14 @@ export class FoodDiaryComponent implements OnInit {
 
   setFoodAsNotEaten() {
     const selectedNodes = this.agGridEatenFoods.api.getSelectedNodes();
-    const selectedFoods: Food[] = selectedNodes.map(node => {
+    const selectedFoods: IFood[] = selectedNodes.map(node => {
       return node.data;
     });
 
     selectedFoods.forEach(food => {
-      // this.apiService.removeFoodEaten(food).subscribe();
       const foodEaten = food;
       foodEaten.timesEaten -= 1;
-      // this.apiService.updateFood(foodEaten)
+
 
       forkJoin(
         [
@@ -150,20 +177,19 @@ export class FoodDiaryComponent implements OnInit {
 
 
   /////////////////////////
-
   refreshChosenFoods() {
-    this.apiService.getChosenFoods().subscribe(
+    this.foodsService.getChosenFoods().subscribe(
       (data) => {
         const foods = [];
         for (const key in data) {
-          const food: Food = {
-            ...emptyFood(),
-            databaseID: key,
+          const food: IFood = {
+            ...emptyIFood(),
+            id: key,
             ...data[key]
           };
 
           if (new Date(food.availableExpiry) < new Date()) {
-            food.available = true;
+            food.availableToBuy = true;
           }
 
           foods.push(food);
@@ -180,23 +206,8 @@ export class FoodDiaryComponent implements OnInit {
   }
 
   refreshEatenFoods() {
-    this.apiService.getFoodsEaten().subscribe(
-      (data) => {
-        const foods: Food[] = [];
-        for (const key in data) {
-          const food: Food = {
-            ...emptyFood(),
-            databaseID: key,
-            ...data[key]
-          };
-
-          if (new Date(food.availableExpiry) < new Date()) {
-            food.available = true;
-          }
-
-          foods.push(food);
-        }
-  
+    this.foodsService.getEatenFoods().subscribe(
+      (foods) => {
         this.allFoodsEaten = foods;
 
         const DAY = 86400000; // 1 day in milliseconds
@@ -206,7 +217,7 @@ export class FoodDiaryComponent implements OnInit {
         this.foodsEatenToday = foods.filter((food) => new Date(food.dateEaten) < tomorrow4AM && new Date(food.dateEaten) > today4AM);
 
         // Sort the foods by date eaten
-        this.allFoodsEaten.sort((a: Food, b: Food) => a.dateEaten < b.dateEaten ? -1 : 1);
+        this.allFoodsEaten.sort((a: IEatenFood, b: IEatenFood) => a.dateEaten < b.dateEaten ? -1 : 1);
         console.log('sorted foods eaten: ', this.allFoodsEaten);
 
         // Find the total calories for each day
@@ -221,10 +232,10 @@ export class FoodDiaryComponent implements OnInit {
         let proteinCurrentDay = 0;
         const proteinPerDay = [];
 
-        this.allFoodsEaten.forEach(food => {
-          if (new Date(food.dateEaten) > startDate && new Date(food.dateEaten) < endDate) {
-            caloriesCurrentDay += food.totalCalories * food.foodFraction;
-            proteinCurrentDay += food.totalProtein * food.foodFraction;
+        this.allFoodsEaten.forEach(eatenFood => {
+          if (new Date(eatenFood.dateEaten) > startDate && new Date(eatenFood.dateEaten) < endDate) {
+            caloriesCurrentDay += eatenFood.food.nutritionalInformation.totalCalories * eatenFood.foodFraction;
+            proteinCurrentDay += eatenFood.food.nutritionalInformation.totalProtein * eatenFood.foodFraction;
           } else {
 
             caloriesPerDay.push({
@@ -237,8 +248,8 @@ export class FoodDiaryComponent implements OnInit {
               date: startDate.toISOString()
             });
 
-            caloriesCurrentDay = food.totalCalories * food.foodFraction;
-            proteinCurrentDay = food.totalProtein * food.foodFraction;
+            caloriesCurrentDay = eatenFood.food.nutritionalInformation.totalCalories * eatenFood.foodFraction;
+            proteinCurrentDay = eatenFood.food.nutritionalInformation.totalProtein * eatenFood.foodFraction;
 
             startDate = new Date(startDate.getTime() + DAY);
             endDate = new Date(endDate.getTime() + DAY);
@@ -260,9 +271,9 @@ export class FoodDiaryComponent implements OnInit {
 
         this.caloriesToday = 0;
         this.proteinToday = 0;
-        this.foodsEatenToday.forEach(food => {
-          this.caloriesToday += food.totalCalories*food.foodFraction;
-          this.proteinToday += food.totalProtein*food.foodFraction;
+        this.foodsEatenToday.forEach(foodEatenToday => {
+          this.caloriesToday += foodEatenToday.food.nutritionalInformation.totalCalories*foodEatenToday.foodFraction;
+          this.proteinToday += foodEatenToday.food.nutritionalInformation.totalProtein*foodEatenToday.foodFraction;
         })
 
         this.averageCaloriesLastWeek = 0;
@@ -283,5 +294,12 @@ export class FoodDiaryComponent implements OnInit {
         console.error(error);
       }
     )
+  }
+
+  public createNewEatenFoodsJSON() {
+    let eatenFoodsJSON = {}
+    this.allFoodsEaten.forEach((f, index) => {
+      
+    })
   }
 }

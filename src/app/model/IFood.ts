@@ -1,141 +1,70 @@
 import { FormGroup } from "@angular/forms"
+import { IIngredient } from "./IIngredient";
+import { emptyINutritionalInformation, INutritionalInformation } from "./INutritionalInformation";
+import { emptyIRatios, IRatios } from "./IRatios";
 
-export interface AddFood {
-    foodId: string; // Id is the database id in the foods list
+// Food has not been added to the database yet and has no ID
+export interface INewFood {
     name: string;
     url: string;
-    extractedPrice: string;
-    pricePerAmount: string;
-    extractedProteinPer100g: string;
-    extractedKJPer100g: string;
-    proteinPer100g: number;
-    kJPer100g: number;
-    caloriesPer100g: number;
-    proteinPer100Calorie: number;
-    poundsPerAsString: string;
-    poundsPer: number;
-    perAmount: string;
-    poundsPer100g: number;
     price: number;
-    multiplesOf100g: number;
-    perEachPer100g: number;
-    totalCalories: number;
-    totalProtein: number;
-    rankWeighting: number;
+    ingredients: IIngredient[];
+    nutritionalInformation: INutritionalInformation;
     timesEaten: number;
-    poundsPer1000Calories: number;
+    availableToBuy: boolean; // Currently out of stock
+    availableExpiry: string; // When to start checking is in stock again
+    noLongerPurchasable: boolean;
+    rank: number;
     ignore: boolean;
-    available: boolean;
-    availableExpiry: string;
-    foodFraction: number;
-    dateEaten: string;
+    ratios: IRatios;
 }
 
-// Food has been added to a database and has a databaseID
-export interface Food extends AddFood {
-    databaseID: string;
+// Food has been added to a database and has an ID
+export interface IFood extends INewFood {
+    id: string;
 }
 
-export function emptyAddFood(): AddFood {
+export function emptyINewFood(): INewFood {
     return {
-        foodId: '',
         name: '',
         url: '',
-        extractedPrice: '',
-        pricePerAmount: '',
-        extractedProteinPer100g: '',
-        extractedKJPer100g: '',
-        proteinPer100g: 0,
-        kJPer100g: 0,
-        caloriesPer100g: 0,
-        proteinPer100Calorie: 0,
-        poundsPerAsString: '',
-        poundsPer: 0,
-        perAmount: '',
-        poundsPer100g: 0,
         price: 0,
-        multiplesOf100g: 0,
-        perEachPer100g: 0,
-        totalCalories: 0,
-        totalProtein: 0,
-        rankWeighting: 0,
+        ingredients: [],
+        nutritionalInformation: emptyINutritionalInformation(),
         timesEaten: 0,
-        poundsPer1000Calories: 0,
-        ignore: false,
-        available: true,
+        availableToBuy: true,
         availableExpiry: new Date().toISOString(),
-        foodFraction: 1,
-        dateEaten: ''
+        noLongerPurchasable: false,
+        rank: 0,
+        ignore: false,
+        ratios: emptyIRatios()
     }
   }
 
-  export function emptyFood(): Food {
+  export function emptyIFood(): IFood {
     return {
-        foodId: '',
-        name: '',
-        url: '',
-        extractedPrice: '',
-        pricePerAmount: '',
-        extractedProteinPer100g: '',
-        extractedKJPer100g: '',
-        proteinPer100g: 0,
-        kJPer100g: 0,
-        caloriesPer100g: 0,
-        proteinPer100Calorie: 0,
-        poundsPerAsString: '',
-        poundsPer: 0,
-        perAmount: '',
-        poundsPer100g: 0,
-        price: 0,
-        multiplesOf100g: 0,
-        perEachPer100g: 0,
-        totalCalories: 0,
-        totalProtein: 0,
-        rankWeighting: 0,
-        timesEaten: 0,
-        poundsPer1000Calories: 0,
-        ignore: false,
-        available: true,
-        availableExpiry: new Date().toISOString(),
-        databaseID: '',
-        foodFraction: 1,
-        dateEaten: ''
+        id: '',
+        ...emptyINewFood()
     }
   }
 
-export function convertFoodToAddFood(food: Food): AddFood {
-    const result: AddFood = emptyAddFood();
-    result.foodId = food.foodId;
-    result.name = food.name;
-    result.url = food.url;
-    result.extractedPrice = food.extractedPrice;
-    result.pricePerAmount = food.pricePerAmount;
-    result.extractedProteinPer100g = food.extractedProteinPer100g;
-    result.extractedKJPer100g = food.extractedKJPer100g;
-    result.proteinPer100g = food.proteinPer100g;
-    result.kJPer100g = food.kJPer100g;
-    result.caloriesPer100g = food.caloriesPer100g;
-    result.proteinPer100Calorie = food.proteinPer100Calorie;
-    result.poundsPerAsString = food.poundsPerAsString;
-    result.poundsPer = food.poundsPer;
-    result.perAmount = food.perAmount;
-    result.poundsPer100g = food.poundsPer100g;
-    result.price = food.price;
-    result.multiplesOf100g = food.multiplesOf100g;
-    result.perEachPer100g = food.perEachPer100g;
-    result.totalCalories = food.totalCalories;
-    result.totalProtein = food.totalProtein;
-    result.rankWeighting = food.rankWeighting;
-    result.timesEaten = food.timesEaten;
-    result.poundsPer1000Calories = food.poundsPer1000Calories;
-    result.ignore = food.ignore;
-    result.available = food.available;
-    result.availableExpiry = food.availableExpiry;
-    result.foodFraction = food.foodFraction;
-    result.dateEaten = food.dateEaten;
-    return result;
+export function convertFoodToNewFood(food: IFood): INewFood {
+    const newFood: INewFood = emptyINewFood();
+    newFood.name = food.name;
+    newFood.url = food.url;
+    newFood.price = food.price;
+    newFood.ingredients = food.ingredients;
+    newFood.nutritionalInformation = food.nutritionalInformation;
+    newFood.timesEaten = food.timesEaten;
+    newFood.availableToBuy = food.availableToBuy;
+    newFood.availableExpiry = food.availableExpiry;
+    newFood.noLongerPurchasable = food.noLongerPurchasable;
+    newFood.rank = food.rank;
+    newFood.ignore = food.ignore;
+    newFood.ratios = food.ratios;
+    return newFood;
 }
 
 export interface IFoodForm extends FormGroup {
-    value: Food;
+    value: IFood;
 }

@@ -22,6 +22,8 @@ import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinne
 import { InterceptorService } from './auth/interceptor.service';
 import { FoodDiaryComponent } from './pages/food-diary/food-diary.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
   declarations: [
@@ -49,6 +51,8 @@ import { LineChartComponent } from './line-chart/line-chart.component';
     MatInputModule,
     BrowserAnimationsModule,
     AgGridModule.withComponents([NameRendererComponent, RankingRendererComponent, { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }]),
+    StoreModule.forRoot({}, {}),
+    EffectsModule.forRoot([]),
   ],
   providers: [],
   bootstrap: [AppComponent]
