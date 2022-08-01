@@ -24,6 +24,10 @@ import { FoodDiaryComponent } from './pages/food-diary/food-diary.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { FoodEffects } from './store/effects/food.effects';
+import { EatenFoodEffects } from './store/effects/eatenFood.effects';
+import { ChosenFoodEffects } from './store/effects/chosenFood.effects';
+import { appReducer } from './store/reducer/app.reducer';
 
 @NgModule({
   declarations: [
@@ -51,8 +55,8 @@ import { EffectsModule } from '@ngrx/effects';
     MatInputModule,
     BrowserAnimationsModule,
     AgGridModule.withComponents([NameRendererComponent, RankingRendererComponent, { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }]),
-    StoreModule.forRoot({}, {}),
-    EffectsModule.forRoot([]),
+    StoreModule.forRoot(appReducer, {}),
+    EffectsModule.forRoot([FoodEffects, EatenFoodEffects, ChosenFoodEffects]),
   ],
   providers: [],
   bootstrap: [AppComponent]

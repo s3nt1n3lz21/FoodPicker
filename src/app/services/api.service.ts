@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { convertChosenFoodToNewChosenFood, IChosenFood, INewChosenFood } from '../model/IChosenFood';
 import { IEatenFood, INewEatenFood } from '../model/IEatenFood';
 import { IFood, INewFood, convertFoodToNewFood } from '../model/IFood';
@@ -15,15 +14,15 @@ export class ApiService {
   ) { }
 
   // Foods
-  getFoods(): Observable<Object[]> {
-    return this.http.get<Object[]>(
+  getFoods(): Observable<IFood[]> {
+    return this.http.get<IFood[]>(
       'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods.json', 
     );
   }
 
-  updateFood(food: IFood) {
+  updateFood(food: IFood): Observable<IFood> {
     const foodWithoutID: INewFood = convertFoodToNewFood(food);
-    return this.http.put(
+    return this.http.put<IFood>(
       //?auth=${this.token}
       `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${food.id}.json`,
       JSON.stringify(foodWithoutID),
@@ -35,8 +34,8 @@ export class ApiService {
     )
   }
 
-  addFood(foodWithoutID: INewFood) {
-    return this.http.post(
+  addFood(foodWithoutID: INewFood): Observable<IFood> {
+    return this.http.post<IFood>(
       `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods.json`,
       JSON.stringify(foodWithoutID),
       {
@@ -47,10 +46,10 @@ export class ApiService {
     )
   }
 
-  deleteFood(food: IFood) {
+  deleteFood(id: string) {
     return this.http.delete(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foods/${id}.json`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -61,20 +60,20 @@ export class ApiService {
   ////////////////////
 
   // Chosen Foods
-  getChosenFoods(): Observable<Object[]> {
-    return this.http.get<Object[]>(
+  getChosenFoods(): Observable<IChosenFood[]> {
+    return this.http.get<IChosenFood[]>(
       'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods.json', 
     );
   }
 
-  clearChosenFoods(): Observable<IChosenFood[]> {
-    return this.http.delete<IChosenFood[]>(
+  clearChosenFoods() {
+    return this.http.delete(
       'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods.json', 
     );
   }
 
-  addChosenFood(newChosenFood: INewChosenFood) {
-    return this.http.post(
+  addChosenFood(newChosenFood: INewChosenFood): Observable<IChosenFood> {
+    return this.http.post<IChosenFood>(
       `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods.json`,
       JSON.stringify(newChosenFood),
       {
@@ -85,10 +84,10 @@ export class ApiService {
     )
   }
 
-  removeChosenFood(chosenFood: IFood) {
+  deleteChosenFood(id: string) {
     return this.http.delete(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${chosenFood.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${id}.json`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -97,9 +96,9 @@ export class ApiService {
     )
   }
 
-  updateChosenFood(chosenFood: IChosenFood) {
+  updateChosenFood(chosenFood: IChosenFood): Observable<IChosenFood> {
     const newChosenFood: INewChosenFood = convertChosenFoodToNewChosenFood(chosenFood);
-    return this.http.put(
+    return this.http.put<IChosenFood>(
       //?auth=${this.token}
       `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/chosenFoods/${chosenFood.id}.json`,
       JSON.stringify(newChosenFood),
@@ -113,8 +112,8 @@ export class ApiService {
   ///////////////////
 
   // Foods Eaten
-  addFoodEaten(foodWithoutID: INewEatenFood) {
-    return this.http.post(
+  addEatenFood(foodWithoutID: INewEatenFood): Observable<IEatenFood> {
+    return this.http.post<IEatenFood>(
       `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten.json`,
       JSON.stringify(foodWithoutID),
       {
@@ -122,18 +121,13 @@ export class ApiService {
           'Content-Type': 'application/json',
         }
       }
-    ).pipe(
-      // Update food if successfully added new food eaten
-      map(response => {
-
-      })
     )
   }
 
-  removeFoodEaten(food: IEatenFood) {
+  deleteEatenFood(id: string) {
     return this.http.delete(
       //?auth=${this.token}
-      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten/${food.id}.json`,
+      `https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten/${id}.json`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -142,8 +136,8 @@ export class ApiService {
     )
   }
 
-  getFoodsEaten(): Observable<Object[]> {
-    return this.http.get<Object[]>(
+  getEatenFoods(): Observable<IEatenFood[]> {
+    return this.http.get<IEatenFood[]>(
       'https://food-picker-e8a62-default-rtdb.europe-west1.firebasedatabase.app/foodsEaten.json', 
     );
   }
